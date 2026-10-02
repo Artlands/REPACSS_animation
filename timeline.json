@@ -1,0 +1,404 @@
+{
+ "total": 420.229,
+ "scenes": [
+  {
+   "id": "intro",
+   "start": 0.0,
+   "dur": 33.588,
+   "sentences": [
+    {
+     "start": 2.0,
+     "end": 5.926,
+     "text": "Every answer an AI model gives you is built one token at a time."
+    },
+    {
+     "start": 6.276,
+     "end": 9.665,
+     "text": "And every token begins, somewhere, as energy."
+    },
+    {
+     "start": 10.015,
+     "end": 14.603,
+     "text": "Almost all of the energy on Earth traces back to a single source: the sun."
+    },
+    {
+     "start": 14.953,
+     "end": 21.793,
+     "text": "At Texas Tech University, the REPACSS project asks: what if a data center could take its energy straight from the sun?"
+    },
+    {
+     "start": 22.143,
+     "end": 24.679,
+     "text": "This is the journey from photons to tokens."
+    },
+    {
+     "start": 25.029,
+     "end": 30.588,
+     "text": "It begins on the high plains of West Texas, about ten miles west of the Texas Tech campus in Lubbock."
+    }
+   ]
+  },
+  {
+   "id": "site",
+   "start": 33.588,
+   "dur": 38.448,
+   "sentences": [
+    {
+     "start": 0.8,
+     "end": 7.55,
+     "text": "This is GLEAMM, the Global Laboratory for Energy Asset Management and Manufacturing, at the Reese Technology Center."
+    },
+    {
+     "start": 7.9,
+     "end": 16.894,
+     "text": "Built in 2015 as a microgrid laboratory, it gives REPACSS its building, its energy infrastructure, and dense instrumentation and control."
+    },
+    {
+     "start": 17.244,
+     "end": 22.829,
+     "text": "Its main renewable source is a 350 kilowatt solar array, right beside the machine room."
+    },
+    {
+     "start": 23.179,
+     "end": 31.464,
+     "text": "Next to it sit a 760 kilowatt-hour battery bank, a 500 kilowatt diesel generator, and a tie to the commercial power grid."
+    },
+    {
+     "start": 31.814,
+     "end": 36.948,
+     "text": "And on the horizon, wind turbines can add their share when the West Texas wind is blowing."
+    }
+   ]
+  },
+  {
+   "id": "problem",
+   "start": 72.036,
+   "dur": 25.953,
+   "sentences": [
+    {
+     "start": 0.8,
+     "end": 6.073,
+     "text": "Supercomputers and AI clusters are hungry machines, built to draw steady power around the clock."
+    },
+    {
+     "start": 6.423,
+     "end": 8.711,
+     "text": "Renewable energy does not behave that way."
+    },
+    {
+     "start": 9.061,
+     "end": 13.931,
+     "text": "Solar output rises and falls with the day, and drops every time a cloud passes."
+    },
+    {
+     "start": 14.281,
+     "end": 19.191,
+     "text": "REPACSS, funded by the National Science Foundation, flips the usual design."
+    },
+    {
+     "start": 19.541,
+     "end": 24.653,
+     "text": "Instead of forcing the energy to follow the computer, it teaches the computer to follow the energy."
+    }
+   ]
+  },
+  {
+   "id": "energy",
+   "start": 97.989,
+   "dur": 45.457,
+   "sentences": [
+    {
+     "start": 0.8,
+     "end": 3.313,
+     "text": "And it does not have to rely on sunlight alone."
+    },
+    {
+     "start": 3.663,
+     "end": 9.71,
+     "text": "The 760 kilowatt-hour battery charges when the sun is strong, and discharges when a cloud passes."
+    },
+    {
+     "start": 10.06,
+     "end": 18.854,
+     "text": "It levels out short swings in available power, so jobs keep running, instead of stopping for a checkpoint and restore cycle every time a cloud drifts by."
+    },
+    {
+     "start": 19.204,
+     "end": 27.693,
+     "text": "If the utility grid goes down, the UPS carries the cluster through the first seconds, while the 500 kilowatt diesel generator starts and takes over the load."
+    },
+    {
+     "start": 28.043,
+     "end": 34.001,
+     "text": "The connection to the commercial grid also lets high priority workloads keep running whenever needed, day or night."
+    },
+    {
+     "start": 34.351,
+     "end": 37.542,
+     "text": "And when the wind is blowing, wind power can join the mix."
+    },
+    {
+     "start": 37.892,
+     "end": 43.957,
+     "text": "Every source can be selected and prioritized by cost and availability, just as a commercial data center would have to."
+    }
+   ]
+  },
+  {
+   "id": "photon",
+   "start": 143.446,
+   "dur": 45.266,
+   "sentences": [
+    {
+     "start": 0.8,
+     "end": 2.166,
+     "text": "Follow a single photon."
+    },
+    {
+     "start": 2.516,
+     "end": 6.565,
+     "text": "Eight minutes after leaving the sun, it strikes a silicon solar cell."
+    },
+    {
+     "start": 6.915,
+     "end": 14.43,
+     "text": "If its energy exceeds silicon's band gap, about 1.1 electron volts, it knocks an electron loose and leaves behind a hole."
+    },
+    {
+     "start": 14.78,
+     "end": 20.878,
+     "text": "The built-in electric field at the p-n junction sweeps them apart, and that separation becomes direct current."
+    },
+    {
+     "start": 21.228,
+     "end": 24.669,
+     "text": "Cells are strung into modules, and modules into arrays."
+    },
+    {
+     "start": 25.019,
+     "end": 30.755,
+     "text": "An inverter, tracking the maximum power point, shapes that DC into clean, 60 hertz AC."
+    },
+    {
+     "start": 31.105,
+     "end": 37.213,
+     "text": "The battery, the generator, and the utility grid join at the same bus, covering whatever the sun cannot."
+    },
+    {
+     "start": 37.563,
+     "end": 43.966,
+     "text": "From there, power flows through the UPS and the power distribution units, down to redundant supplies in every server."
+    }
+   ]
+  },
+  {
+   "id": "compute",
+   "start": 188.711,
+   "dur": 52.377,
+   "sentences": [
+    {
+     "start": 0.8,
+     "end": 3.481,
+     "text": "Inside, the electrons meet the machine."
+    },
+    {
+     "start": 3.831,
+     "end": 15.185,
+     "text": "REPACSS has 110 CPU nodes, each with two AMD EPYC 9754 processors: 256 cores and 1.5 terabytes of DDR5 memory per node."
+    },
+    {
+     "start": 15.535,
+     "end": 24.159,
+     "text": "Eight GPU nodes each carry four NVIDIA H100 NVL accelerators, with 94 gigabytes of high bandwidth memory apiece."
+    },
+    {
+     "start": 24.509,
+     "end": 31.728,
+     "text": "Nine storage nodes, holding about 2.9 petabytes, plus head, login, and utility nodes, complete the cluster."
+    },
+    {
+     "start": 32.078,
+     "end": 43.758,
+     "text": "Every node has two 200 gigabit InfiniBand links, one per socket. Leaf switches fan them out, two core switches join the leaves at 800 gigabits, and every node has a direct path to storage."
+    },
+    {
+     "start": 44.107,
+     "end": 50.877,
+     "text": "In total: nearly 29 thousand cores, 32 GPUs, and 176 terabytes of memory."
+    }
+   ]
+  },
+  {
+   "id": "tokens",
+   "start": 241.088,
+   "dur": 29.271,
+   "sentences": [
+    {
+     "start": 0.8,
+     "end": 3.914,
+     "text": "On a GPU, electrons become arithmetic."
+    },
+    {
+     "start": 4.264,
+     "end": 9.866,
+     "text": "Transistors switch billions of times a second as tensor cores multiply model weights against your prompt."
+    },
+    {
+     "start": 10.216,
+     "end": 17.591,
+     "text": "Layer after layer, attention and feed-forward, until a probability distribution emerges and the next token is chosen."
+    },
+    {
+     "start": 17.941,
+     "end": 19.769,
+     "text": "Then the next. And the next."
+    },
+    {
+     "start": 20.119,
+     "end": 27.771,
+     "text": "Sunlight, electrons, floating point operations, tokens. That is the chain REPACSS makes visible, and measurable."
+    }
+   ]
+  },
+  {
+   "id": "measure",
+   "start": 270.359,
+   "dur": 37.048,
+   "sentences": [
+    {
+     "start": 0.8,
+     "end": 2.812,
+     "text": "And measurable is the key word."
+    },
+    {
+     "start": 3.162,
+     "end": 11.067,
+     "text": "GLEAMM's power instrumentation, including phasor measurement units and protective relays, samples voltage and current waveforms across the facility."
+    },
+    {
+     "start": 11.417,
+     "end": 20.791,
+     "text": "That lets the team measure power quality, including harmonic distortion: the extra frequencies that switching power supplies add on top of the clean 60 hertz wave."
+    },
+    {
+     "start": 21.141,
+     "end": 26.512,
+     "text": "REPACSS studies how different workloads, and even individual codes, change these signatures as they run."
+    },
+    {
+     "start": 26.862,
+     "end": 35.548,
+     "text": "And it measures the total energy each code consumes, so researchers can see what a result really costs, and find ways to make their software more efficient."
+    }
+   ]
+  },
+  {
+   "id": "remote",
+   "start": 307.407,
+   "dur": 31.691,
+   "sentences": [
+    {
+     "start": 0.8,
+     "end": 3.888,
+     "text": "The first research challenge is remote data center management."
+    },
+    {
+     "start": 4.238,
+     "end": 9.112,
+     "text": "A facility powered by variable energy cannot wait for someone to walk the machine room floor."
+    },
+    {
+     "start": 9.462,
+     "end": 19.442,
+     "text": "REPACSS streams telemetry from every node, power, temperature, utilization, so operators can watch in real time, intervene remotely, and adapt the cluster as energy changes."
+    },
+    {
+     "start": 19.792,
+     "end": 30.391,
+     "text": "A private monitoring and control network reaches beyond the servers, to the UPS, the power distribution units, and the in-row coolers, with new sensors for cooling power and outdoor temperature."
+    }
+   ]
+  },
+  {
+   "id": "schedule",
+   "start": 339.097,
+   "dur": 27.618,
+   "sentences": [
+    {
+     "start": 0.8,
+     "end": 3.74,
+     "text": "The second challenge is workflow scheduling integration."
+    },
+    {
+     "start": 4.09,
+     "end": 11.85,
+     "text": "The team is building algorithms for the Slurm scheduler that read solar production forecasts and place scientific workloads where the power is."
+    },
+    {
+     "start": 12.2,
+     "end": 18.925,
+     "text": "Large parallel runs at solar noon, flexible and preemptible jobs filling the gaps, lighter work after sunset."
+    },
+    {
+     "start": 19.275,
+     "end": 26.118,
+     "text": "The goal: match as much computing as possible to low cost energy, while studying the tradeoff between cost and quality of service."
+    }
+   ]
+  },
+  {
+   "id": "checkpoint",
+   "start": 366.716,
+   "dur": 28.754,
+   "sentences": [
+    {
+     "start": 0.8,
+     "end": 3.305,
+     "text": "The third challenge is checkpointing and restore."
+    },
+    {
+     "start": 3.655,
+     "end": 10.885,
+     "text": "The battery rides through brief dips, but when clouds linger and stored energy runs low, running jobs cannot simply die."
+    },
+    {
+     "start": 11.235,
+     "end": 17.789,
+     "text": "Applications periodically save their state, using nearly two terabytes of fast local NVMe on every node."
+    },
+    {
+     "start": 18.139,
+     "end": 20.758,
+     "text": "Nodes can then idle, or power down."
+    },
+    {
+     "start": 21.108,
+     "end": 27.254,
+     "text": "When the energy returns, jobs restore and continue exactly where they left off, with their data intact."
+    }
+   ]
+  },
+  {
+   "id": "outro",
+   "start": 395.47,
+   "dur": 24.759,
+   "sentences": [
+    {
+     "start": 1.0,
+     "end": 7.576,
+     "text": "REPACSS is a production resource in the NSF ACCESS ecosystem, open to researchers nationwide."
+    },
+    {
+     "start": 7.926,
+     "end": 16.135,
+     "text": "Its larger goal: show the data center industry that variable energy and advanced computing can work together, cutting costs and improving efficiency."
+    },
+    {
+     "start": 16.485,
+     "end": 20.259,
+     "text": "From photons, to electrons, to tokens. This is REPACSS."
+    }
+   ]
+  }
+ ]
+}
