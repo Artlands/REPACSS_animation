@@ -4,6 +4,8 @@ A 7-minute narrated explainer video for **REPACSS** (REmotely-managed Power Awar
 
 It follows energy from the sun to the GLEAMM microgrid at the Reese Technology Center, through the solar array, battery, generator and grid, into the REPACSS cluster, and out as AI tokens. It then covers the project's research challenges: power instrumentation, remote management, energy-aware scheduling, and checkpoint/restore.
 
+[![REPACSS — From Photons to Tokens (title card)](docs/thumbnail.jpg)](https://github.com/Artlands/REPACSS_animation/releases/download/v1.0.0/REPACSS_photons_to_tokens.mp4)
+
 **▶ Watch / download the video:** [REPACSS_photons_to_tokens.mp4 (release v1.0.0)](https://github.com/Artlands/REPACSS_animation/releases/download/v1.0.0/REPACSS_photons_to_tokens.mp4) — 7:00, 1080p, with captions. See all [releases](https://github.com/Artlands/REPACSS_animation/releases).
 
 Every frame is rendered from code. The scenes are written in [three.js](https://threejs.org), headless Chrome captures them frame by frame, and ffmpeg encodes the result. The narration is synthesized speech, and the music bed is generated in code.
