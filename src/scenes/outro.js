@@ -24,7 +24,7 @@ export default function outro(sc, shared) {
     ui.el('o-sl', 'slogan', 'Accelerating <b>Discovery</b><br><b>Reducing</b> Costs<br>Improving <b>Efficiency</b>', 460, 345, sg, { fontSize: '76px' });
     const end = ramp(t, s(2) - .2, 1.2);
     ui.el('o-dim', '', '', 0, 0, end * .6, { width: '1920px', height: '1080px', background: '#02040a', zIndex: -1 });
-    ui.el('o-c', 'h1', '<span style="color:var(--sun)">Photons</span> <span style="color:#8090b0">→</span> <span style="color:var(--elec)">Electrons</span> <span style="color:#8090b0">→</span> <span style="color:#8dff6f">FLOPs</span> <span style="color:#8090b0">→</span> <span style="color:var(--tok)">Tokens</span>', 960, 230, end, { fontSize: '54px', transform: 'translateX(-50%)' });
+    ui.el('o-c', 'h1', shared.endLine ?? '<span style="color:var(--sun)">Photons</span> <span style="color:#8090b0">→</span> <span style="color:var(--elec)">Electrons</span> <span style="color:#8090b0">→</span> <span style="color:#8dff6f">FLOPs</span> <span style="color:#8090b0">→</span> <span style="color:var(--tok)">Tokens</span>', 960, 230, end, { fontSize: '54px', transform: 'translateX(-50%)' });
     const e2 = ramp(t, s(2) + 2.6, 1);
     ui.el('o-r', '', '<img src="assets/repacss-red.svg" style="width:880px;display:block">', 960, 350, e2, { transform: 'translateX(-50%)' });
     ui.el('o-s', 'slogan', 'Accelerating <b>Discovery</b>, <b>Reducing</b> Costs, Improving <b>Efficiency</b>', 960, 605, ramp(t, s(2) + 3.2, 1), { fontSize: '38px', fontWeight: '500', transform: 'translateX(-50%)' });

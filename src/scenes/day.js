@@ -42,10 +42,23 @@ function world() {
   scene.add(S.bolt);
   // red aviation lights on the turbine nacelles
   S.avia = S.turbines.map(rt => { const g = glowSprite(0xff2a2a, 7, 0); g.position.set(0, 53.6, 0); rt.parent.add(g); return g; });
+  // the REPACSS row inside the building, seen through a cutaway: half scale (real 2.2 m cabinets), fronts facing the east wall
+  S.glow.visible = false;
+  const row = machineRow(); row.group.scale.setScalar(.5); row.group.rotation.y = Math.PI / 2; row.group.position.set(2.2, 0, .3); scene.add(row.group);
+  const lamp = new THREE.PointLight(0xbfdcff, 14, 14); lamp.position.set(4.6, 3.2, .3); scene.add(lamp);
+  const nodes = row.racks.flatMap(rk => rk.nodes), ord = nodes.map(() => r()), walls = [];
+  S.dc.traverse(o => { if (o.isMesh && o !== S.glow) walls.push(o); });
+  /** busy 0..1 = share of nodes running; xray 0..1 fades the building shell to show the row */
+  const cluster = (t, busy, xray) => {
+    row.group.visible = lamp.visible = xray > .01; row.spin(t);
+    nodes.forEach((n, i) => { const on = ord[i] < busy; n.led.material.emissiveIntensity = on ? 1.6 + .4 * Math.sin(t * 4 + i) : .05; n.dot.material.emissiveIntensity = on && Math.sin(t * 9 + i * 7) > .2 ? 1.6 : .1; });
+    walls.forEach(m => { m.material.transparent = xray > .01; m.material.opacity = 1 - .85 * xray; m.material.depthWrite = xray < .01; m.castShadow = xray < .5; });
+  };
 
   const white = new THREE.Color(1, 1, 1), night = new THREE.Color(0x0a1228), warm = new THREE.Color(0xffb27a), gray = new THREE.Color(0x262c36), fog0 = new THREE.Color(0xb7c4d6);
   /** set sky, sun, stars and weather for hour h; storm 0..1, rain 0..1 */
-  S.set = (t, h, { storm = 0, rain = 0, cloud = null, flash = 0, camera } = {}) => {
+  S.set = (t, h, { storm = 0, rain = 0, cloud = null, flash = 0, camera, busy = .6, xray = 0 } = {}) => {
+    cluster(t, busy, xray);
     const d = sunDir(h), el = d.y, day = clamp((el + .12) / .3), low = 1 - clamp(el / .35);
     S.sunL.position.copy(S.sunL.target.position).addScaledVector(d, 150);
     S.sunL.intensity = 2.6 * clamp(el * 5) * (1 - .85 * storm);
@@ -78,7 +91,11 @@ function world() {
   };
   return S;
 }
-const W0 = (shared) => { shared.site ??= buildSite(); return shared.day ??= world(); };   // outro uses its own clean site
+const W0 = (shared) => {   // outro uses its own clean site, and this story's end line
+  shared.site ??= buildSite();
+  shared.endLine = '<span style="color:var(--sun)">One day.</span> <span style="color:#8090b0">·</span> <span style="color:var(--elec)">Every day.</span> <span style="color:#8090b0">·</span> <span style="color:#ffd9a0">Following the sun.</span>';
+  return shared.day ??= world();
+};
 
 // ---------- overlay helpers ----------
 const clock = (h) => { const m = Math.floor(((h % 24) + 24) % 24 * 60), hh = Math.floor(m / 60); return `${(hh + 11) % 12 + 1}:${String(m % 60).padStart(2, '0')} ${hh < 12 ? 'AM' : 'PM'}`; };
@@ -119,8 +136,8 @@ export function predawn(sc, shared) {
     [0, V(46, 5, -64), V(-40, 120, -250)],
     [s(1) - .5, V(44, 6, -60), V(-30, 90, -250)],
     [s(1) + 3.5, V(30, 9, -36), V(0, 3, 0)],
-    [s(2) + .2, V(18, 4.5, 9), V(6, 3.2, 1.5)],
-    [s(3) - .3, V(15, 4.2, 7), V(6, 3.2, 1.5)],
+    [s(2) + .2, V(13, 3.2, 6), V(2.5, 1.3, .3)],
+    [s(3) - .3, V(11, 2.8, 4.5), V(2.5, 1.3, .3)],
     [s(3) + 2.5, V(2, 6, -22), V(-90, 26, -200)],
     [s(4) - .2, V(-2, 6, -18), V(-100, 30, -220)],
     [s(4) + 3, V(-26, 6, 6), V(200, 18, -50)],
@@ -130,10 +147,10 @@ export function predawn(sc, shared) {
   function update(t) {
     camPath(camera, t, keys);
     const h = lerp(4.5, 4.75, t / s(4)) + 1.2 * ramp(t, s(4), sc.dur - s(4));   // time-lapse toward first light at the end
-    S.set(t, h, { camera }); S.flowsAt(t, [0, .45, .7, 0, 0]);
+    S.set(t, h, { camera, busy: .35, xray: win(t, s(2) - .3, s(3) + .3, .8) }); S.flowsAt(t, [0, .45, .7, 0, 0]);
     const hd = win(t, .6, tEnd + .3, .7);
     header('pd', h, 'Waiting for the sun', hd);
-    ui.label('pd-dc', 'REPACSS<small>inside the GLEAMM building</small>', V(6.4, 4.4, 1.5), camera, win(t, s(2) + .6, s(3) - .2, .5), '#7fe6ff');
+    ui.label('pd-dc', 'REPACSS cluster<small>inside the GLEAMM building · overnight work</small>', V(2.4, 2.9, .3), camera, win(t, s(2) + .6, s(3) - .2, .5), '#7fe6ff');
     ui.label('pd-wd', 'Wind turbines<small>interconnected · turning tonight</small>', V(-155, 78, -255), camera, win(t, s(3) + 2.2, s(4) - .2, .5), '#cfe8ff');
     mixCard('pd-m', { solar: 0, soc: .55, grid: .55, wind: .45, status: 'Overnight queue · priority work only', color: '#9fd6ff' }, win(t, s(3) + .4, tEnd + .3, .6));
     dayBar('pd-b', h, win(t, s(0) + 1, tEnd + .3, .6));
@@ -157,7 +174,7 @@ export function dawn(sc, shared) {
   function update(t) {
     camPath(camera, t, keys);
     const h = lerp(6.83, 7.7, t / sc.dur), sun = clamp((h - 6.9) / 3.5) * .5;
-    S.set(t, h, { camera }); S.flowsAt(t, [sun * 2, .3 * (1 - sun), .8, .5 * ramp(t, s(3), 2), 0]);
+    S.set(t, h, { camera, busy: lerp(.35, .8, ramp(t, s(3), 3)) }); S.flowsAt(t, [sun * 2, .3 * (1 - sun), .8, .5 * ramp(t, s(3), 2), 0]);
     header('dw', h, 'First light', win(t, .4, sc.dur, .6));
     const fc = win(t, s(1) + .2, s(3) - .2, .5);
     ui.el('dw-f', 'card', `<div class="cap" style="margin:0 0 12px">Solar forecast → today's plan</div>` + plan.map(([c, when, sky, act], i) =>
@@ -234,7 +251,7 @@ export function cloud(sc, shared) {
   function update(t) {
     camPath(camera, t, keys);
     const h = lerp(15.45, 15.65, t / sc.dur), c = cover(t), sol = .86 * (1 - .65 * c);
-    S.set(t, h, { cloud: gx(t), camera }); S.flowsAt(t, [sol, .05, .9, c, 0]);
+    S.set(t, h, { cloud: gx(t), camera, busy: .97 }); S.flowsAt(t, [sol, .05, .9, c, 0]);
     header('cl', h, 'Passing clouds', win(t, .4, sc.dur, .6));
     // solar output vs. power delivered to the cluster
     const P = (x, y) => `${(x / sc.dur * 560).toFixed(1)},${(150 - y * 140).toFixed(1)}`;
@@ -260,8 +277,8 @@ export function storm(sc, shared) {
     [0, V(60, 9, -10), V(-150, 30, -70)],
     [s(1) - .2, V(40, 8, -16), V(-150, 25, -80)],
     [s(1) + 2.4, V(-4, 7, -34), V(-30, 6, -30)],
-    [s(2) - .2, V(18, 5, 12), V(5, 3, 1)],
-    [s(3) - .2, V(14, 4.6, 9), V(6, 3.2, 1.5)],
+    [s(2) - .2, V(14, 3.6, 8), V(2.5, 1.3, .3)],
+    [s(3) - .2, V(11, 3, 5), V(2.5, 1.3, .3)],
     [s(3) + 1, V(-21, 4.5, 7), V(-13, 1.6, -2.5)],
     [s(4) - .2, V(-22, 4, 5), V(-13, 1.6, -2.5)],
     [sc.dur, V(30, 14, 34), V(-6, 2, -2)],
@@ -272,15 +289,15 @@ export function storm(sc, shared) {
     const shake = win(t, genOn, genOn + 1.2, .3) * .04;
     camPath(camera, t, keys); camera.position.y += Math.sin(t * 60) * shake;
     const h = lerp(18.33, 18.45, t / sc.dur), flash = fl(t, s(0) + 3) * .5 + fl(t, strike) + fl(t, s(4) + 3) * .4;
-    S.set(t, h, { storm: ramp(t, 0, 1.5), rain: ramp(t, .5, 2), flash, camera });
     const out = t > strike, gen = ramp(t, genOn, 1.2), ups = out && t < genOn + 1;
+    const busy = out && t < strike + 1.2 && Math.sin(t * 50) < 0 ? 0 : lerp(.95, .5, ramp(t, s(4) + 1.2, 3));   // the room blinks, then the UPS holds it
+    S.set(t, h, { storm: ramp(t, 0, 1.5), rain: ramp(t, .5, 2), flash, camera, busy, xray: win(t, s(2) - .5, s(3) + .4, .8) });
     S.flowsAt(t, [.05, out ? 0 : .7, ups ? .4 : .8, 0, gen]);
-    if (out && t < strike + 1.2) S.glow.material.emissiveIntensity = Math.sin(t * 50) > 0 ? 3 : .4;   // the room blinks, then the UPS holds it
     ui.el('st-fl', '', '', 0, 0, flash * .55, { width: '1920px', height: '1080px', background: '#dfe8ff', zIndex: -1 });
     header('st', h, 'The storm', win(t, .4, sc.dur, .6));
     ui.label('st-gr', '<span style="color:#ff6b75">Grid down</span><small>utility line tripped</small>', V(-27, 12, -12), camera, win(t, strike + .3, s(2) - .2, .4), '#fff');
     const sec = Math.max(0, Math.min(t, genOn) - strike);
-    ui.label('st-ups', `UPS carrying every node<small class="mono">${sec.toFixed(1)} s</small>`, V(6.4, 4.6, 1.5), camera, win(t, s(2) + .3, s(3) + .6, .4), '#7dffa5');
+    ui.label('st-ups', `UPS carrying every node<small class="mono">${sec.toFixed(1)} s</small>`, V(2.4, 2.9, .3), camera, win(t, s(2) + .3, s(3) + .6, .4), '#7dffa5');
     ui.label('st-gn', 'Diesel generator<small>500 kW · online</small>', V(-13, 3.6, -2.5), camera, win(t, genOn, s(4) - .2, .4), '#ffb07a');
     ui.el('st-j', 'card', `<div class="cap" style="margin:0 0 10px">Scheduler response</div>` + jobs.map(([j, kind, st, c], i) =>
       `<div style="display:flex;gap:18px;font-size:22px;line-height:1.9;opacity:${ramp(t, s(4) + 1.2 + i * 1.6, .4)}"><span class="mono" style="width:160px;color:#cdb6ff">${j}</span><span style="width:150px;color:var(--dim)">${kind}</span><span style="color:${c}">${st}</span></div>`).join(''), 1200, 300, win(t, s(4) + .4, sc.dur, .5));
@@ -297,8 +314,8 @@ export function night(sc, shared) {
   const keys = [
     [0, V(2, 6, -22), V(-90, 26, -200)],
     [s(1) + 3, V(-6, 7, -18), V(-110, 32, -220)],
-    [s(2) + .6, V(16, 4.4, 9), V(6, 3.2, 1.5)],
-    [s(3), V(13, 4.2, 7), V(6, 3.2, 1.5)],
+    [s(2) + .6, V(13, 3.2, 6), V(2.5, 1.3, .3)],
+    [s(3), V(10.5, 2.8, 4.2), V(2.5, 1.3, .3)],
     [s(3) + 4, V(-30, 70, 130), V(-30, 0, 0)],
     [sc.dur, V(-40, 95, 160), V(-30, 0, -10)],
   ];
@@ -306,12 +323,11 @@ export function night(sc, shared) {
   function update(t) {
     camPath(camera, t, keys);
     const h = lerp(22, 22.4, t / sc.dur);
-    S.set(t, h, { camera }); S.flowsAt(t, [0, .6, .8, .3, 0]);
+    S.set(t, h, { camera, busy: lerp(.5, .95, ramp(t, s(2) + .8, 2.5)), xray: win(t, s(2) - .3, s(3) + .3, .8) }); S.flowsAt(t, [0, .6, .8, .3, 0]);
     S.turbines.forEach(r => r.rotation.z = t * 1.7 + r.ph);
-    S.glow.material.emissiveIntensity = 2 + 2 * win(t, s(2) + .3, s(3), .6) + .6 * Math.sin(t * 3);
     header('nt', h, 'Wind and starlight', win(t, .4, l3.start - .2, .6));
     ui.label('nt-wd', 'Wind turbines<small>2 × 300 kVA · interconnected</small>', V(-155, 78, -255), camera, win(t, s(1) + .4, s(2) - .2, .5), '#cfe8ff');
-    ui.label('nt-rs', 'Restoring from NVMe<small>climate-sim · md-batch · resumed ✓</small>', V(6.4, 4.6, 1.5), camera, win(t, s(2) + .8, s(3) - .2, .4), '#cdb6ff');
+    ui.label('nt-rs', 'Restoring from NVMe<small>climate-sim · md-batch · resumed ✓</small>', V(2.4, 2.9, .3), camera, win(t, s(2) + .8, s(3) - .2, .4), '#cdb6ff');
     mixCard('nt-m', { solar: 0, soc: .66, batt: -.2, grid: .5, wind: .8, status: t > s(2) + 1.5 ? 'Paused jobs resumed · nothing lost' : 'Grid restored', color: '#7dffa5' }, win(t, .8, l3.start - .2, .6));
     dayBar('nt-b', h, win(t, .6, sc.dur, .6));
     recap.forEach((x, i) => ui.el('nt-r' + i, 'h1', x, 960, 300 + i * 92, win(t, l3.start + i * (l3.end - l3.start) / 4.2, sc.dur, .5), { fontSize: '54px', transform: 'translateX(-50%)' }));
