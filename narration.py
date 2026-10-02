@@ -160,7 +160,53 @@ ONE_DAY = [
         "Tomorrow, the sun will rise again. And the computer will be ready to follow it.",
     ]),
 ]
-STORIES = {"photons": SCRIPT, "one_day": ONE_DAY}
+# "The Journey of Job 41827": one researcher's simulation, from a laptop to the sun and back (src/scenes/job.js)
+JOB = [
+    ("submit", 2.0, 4.0, [
+        "Eleven at night, somewhere on the Great Plains, a researcher presses enter.",
+        "The job is a drought model for the Ogallala aquifer, the vast underground water that farms from South Dakota to Texas depend on.",
+        "Through the NSF ACCESS program, it travels hundreds of miles, to a supercomputer that runs on sunlight.",
+        "This is the journey of job 41827.",
+    ]),
+    ("queue", 0.8, 1.5, [
+        "It lands in the Slurm queue at REPACSS, in Lubbock, Texas.",
+        "An ordinary scheduler would start it the moment enough nodes were free, day or night.",
+        "This one reads tomorrow's solar forecast first.",
+        "It packs the biggest jobs under the peak of the sunlight curve, slides flexible work into the shoulders, and keeps the night for work that cannot wait.",
+        "Job 41827 needs 32 nodes for six hours. The scheduler gives it a place in the sun, at ten in the morning.",
+    ]),
+    ("morning", 0.8, 1.3, [
+        "Ten o'clock. The solar array is climbing toward full power, and the job begins.",
+        "Thirty two nodes, more than eight thousand cores, wake up together.",
+    ]),
+    ("run", 0.8, 1.5, [
+        "Each node simulates its own slice of the plains: soil, rain, wells, and crops.",
+        "Over InfiniBand, the nodes trade the edges of their slices thousands of times a second, so the water can flow across the whole map.",
+        "And every node reports its power as it runs, so the energy behind this one result can be counted, watt by watt.",
+    ]),
+    ("overcast", 0.8, 1.5, [
+        "At one o'clock, a thick bank of clouds settles over the array, and it does not move.",
+        "The battery carries the load for a while, but the clouds outlast it.",
+        "So the scheduler makes a decision. Job 41827 saves its state to fast local NVMe on every node, and its nodes power down.",
+        "Nothing is lost. The job simply waits for the sun.",
+    ]),
+    ("resume", 0.8, 1.5, [
+        "Three fifteen. The clouds break up, and sunlight floods the array again.",
+        "The nodes power back on, read their checkpoints, and pick up at the exact time step where they stopped.",
+        "By evening, the run is complete.",
+    ]),
+    ("results", 0.8, 1.5, [
+        "The results travel back across the plains, to the researcher who asked the question.",
+        "A map of where the aquifer is most at risk, and of how much water careful irrigation could save.",
+        "Sunlight that fell on the High Plains, helping the High Plains keep their water.",
+    ]),
+    ("outro", 1.0, 4.5, [
+        "REPACSS is a production resource in the NSF ACCESS ecosystem, open to researchers across the country.",
+        "Every job it runs shows that advanced computing and variable energy can work together, accelerating discovery, reducing costs, and improving efficiency.",
+        "Somewhere tonight, another researcher is pressing enter. And tomorrow, the sun will be ready.",
+    ]),
+]
+STORIES = {"photons": SCRIPT, "one_day": ONE_DAY, "job": JOB}
 STORY = sys.argv[1] if len(sys.argv) > 1 else "photons"
 SFX = "" if STORY == "photons" else "_" + STORY
 

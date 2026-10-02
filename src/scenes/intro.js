@@ -16,34 +16,9 @@ export const ll = (lat, lon, r = R) => {
 };
 const TTU = [33.584, -101.875], GLEAMM = [33.597, -102.047];
 
-export default function intro(sc) {
-  const s = sc.s;
-  const scene = new THREE.Scene(); scene.background = new THREE.Color(0x010208);
-  const camera = new THREE.PerspectiveCamera(40, 16 / 9, .5, 4000);
-  scene.add(new THREE.AmbientLight(0x6070a0, .08));
-
-  // starfield on a far shell
-  const r = rng(7), sp = new Float32Array(5000 * 3);
-  for (let i = 0; i < 5000; i++) { const v = V(r() - .5, r() - .5, r() - .5).normalize().multiplyScalar(1500 + r() * 500); sp.set([v.x, v.y, v.z], i * 3); }
-  const stars = new THREE.Points(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(sp, 3)),
-    new THREE.PointsMaterial({ color: 0xaab8ff, size: 2.2, sizeAttenuation: false, transparent: true, opacity: .8 }));
-  scene.add(stars);
-
-  // sun (far left), its light falls on the Earth
-  const SUN = V(-300, 30, -60);
-  const sun = new THREE.Mesh(new THREE.SphereGeometry(16, 48, 32), new THREE.MeshBasicMaterial({ color: 0xfff6e2, toneMapped: false })); sun.position.copy(SUN); scene.add(sun);
-  const corona = glowSprite(C.sun, 150, .95); corona.position.copy(SUN); scene.add(corona);
-  const halo = glowSprite(0xffe2a0, 60, 1); halo.position.copy(SUN); scene.add(halo);
-  const key = new THREE.DirectionalLight(0xfff4e6, 3.2); key.position.copy(SUN); scene.add(key);
-  const sunDir = SUN.clone().normalize();
-
-  // Earth: oriented so Lubbock ends up facing the sun-lit side toward the final camera
-  const earth = new THREE.Group(); scene.add(earth);
-  const spin = new THREE.Group(); earth.add(spin);
-  const target = V(-.6, .45, .66).normalize();
-  earth.quaternion.setFromUnitVectors(ll(...GLEAMM).normalize(), target);
-  // one pass: day map (+ hi-res Texas patch) lit by the sun, city lights on the night side, clouds, ocean glint.
-  // A single sphere avoids the z-fighting that stacked shells produce at this scale.
+/** Earth: day map (+ hi-res Texas patch) lit from sunDir, city lights on the night side, clouds, ocean glint,
+ *  plus an atmosphere halo shell. A single surface sphere avoids the z-fighting that stacked shells produce at this scale. */
+export function earthGlobe(sunDir) {
   const surf = new THREE.Mesh(new THREE.SphereGeometry(R, 256, 128), new THREE.ShaderMaterial({
     uniforms: { day: { value: dayTex }, night: { value: nightTex }, clouds: { value: cloudTex }, spec: { value: specTex }, texas: { value: texasTex },
       box: { value: TEXAS }, sunDir: { value: sunDir }, cloudShift: { value: 0 } },
@@ -70,14 +45,43 @@ export default function intro(sc) {
         gl_FragColor=vec4(mix(nightc,dayc,lit),1.);
       }`,
   }));
-  spin.add(surf);
   // atmosphere halo just outside the limb (view-space fresnel on a slightly larger back-facing shell)
   const atmo = new THREE.Mesh(new THREE.SphereGeometry(R * 1.025, 128, 64), new THREE.ShaderMaterial({
     uniforms: { sunDir: { value: sunDir } }, transparent: true, depthWrite: false, side: THREE.BackSide, blending: THREE.AdditiveBlending,
     vertexShader: 'varying vec3 vN; varying vec3 vW; void main(){ vN=normalize(mat3(modelMatrix)*normal); vW=(modelMatrix*vec4(position,1.)).xyz; gl_Position=projectionMatrix*viewMatrix*vec4(vW,1.); }',
     fragmentShader: 'uniform vec3 sunDir; varying vec3 vN; varying vec3 vW; void main(){ vec3 v=normalize(cameraPosition-vW); float k=pow(clamp(1.+dot(v,vN)*1.6,0.,1.),2.2); float lit=smoothstep(-.35,.4,dot(vN,sunDir)); gl_FragColor=vec4(vec3(.32,.58,1.)*k*lit*1.4,1.); }',
   }));
-  earth.add(atmo);
+  return { surf, atmo };
+}
+
+export default function intro(sc) {
+  const s = sc.s;
+  const scene = new THREE.Scene(); scene.background = new THREE.Color(0x010208);
+  const camera = new THREE.PerspectiveCamera(40, 16 / 9, .5, 4000);
+  scene.add(new THREE.AmbientLight(0x6070a0, .08));
+
+  // starfield on a far shell
+  const r = rng(7), sp = new Float32Array(5000 * 3);
+  for (let i = 0; i < 5000; i++) { const v = V(r() - .5, r() - .5, r() - .5).normalize().multiplyScalar(1500 + r() * 500); sp.set([v.x, v.y, v.z], i * 3); }
+  const stars = new THREE.Points(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(sp, 3)),
+    new THREE.PointsMaterial({ color: 0xaab8ff, size: 2.2, sizeAttenuation: false, transparent: true, opacity: .8 }));
+  scene.add(stars);
+
+  // sun (far left), its light falls on the Earth
+  const SUN = V(-300, 30, -60);
+  const sun = new THREE.Mesh(new THREE.SphereGeometry(16, 48, 32), new THREE.MeshBasicMaterial({ color: 0xfff6e2, toneMapped: false })); sun.position.copy(SUN); scene.add(sun);
+  const corona = glowSprite(C.sun, 150, .95); corona.position.copy(SUN); scene.add(corona);
+  const halo = glowSprite(0xffe2a0, 60, 1); halo.position.copy(SUN); scene.add(halo);
+  const key = new THREE.DirectionalLight(0xfff4e6, 3.2); key.position.copy(SUN); scene.add(key);
+  const sunDir = SUN.clone().normalize();
+
+  // Earth: oriented so Lubbock ends up facing the sun-lit side toward the final camera
+  const earth = new THREE.Group(); scene.add(earth);
+  const spin = new THREE.Group(); earth.add(spin);
+  const target = V(-.6, .45, .66).normalize();
+  earth.quaternion.setFromUnitVectors(ll(...GLEAMM).normalize(), target);
+  const { surf, atmo } = earthGlobe(sunDir);
+  spin.add(surf); earth.add(atmo);
 
   // a photon travels sun -> Earth
   const pPath = curve([SUN.x + 20, SUN.y, SUN.z], [-120, 22, -90], target.clone().multiplyScalar(R * 1.02).toArray());

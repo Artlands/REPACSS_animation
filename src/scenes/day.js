@@ -47,18 +47,24 @@ function world() {
   const row = machineRow(); row.group.scale.setScalar(.5); row.group.rotation.y = Math.PI / 2; row.group.position.set(2.2, 0, .3); scene.add(row.group);
   const lamp = new THREE.PointLight(0xbfdcff, 14, 14); lamp.position.set(4.6, 3.2, .3); scene.add(lamp);
   const nodes = row.racks.flatMap(rk => rk.nodes), ord = nodes.map(() => r()), walls = [];
+  const base = nodes.map(n => n.led.material.emissive.getHex()), jobSet = new Set(JOB_NODES(row));
   S.dc.traverse(o => { if (o.isMesh && o !== S.glow) walls.push(o); });
   /** busy 0..1 = share of nodes running; xray 0..1 fades the building shell to show the row */
-  const cluster = (t, busy, xray) => {
+  /** job (optional) 0..1 lights the 32 nodes of job 41827 in violet (0 = powered down) */
+  const cluster = (t, busy, xray, job) => {
     row.group.visible = lamp.visible = xray > .01; row.spin(t);
-    nodes.forEach((n, i) => { const on = ord[i] < busy; n.led.material.emissiveIntensity = on ? 1.6 + .4 * Math.sin(t * 4 + i) : .05; n.dot.material.emissiveIntensity = on && Math.sin(t * 9 + i * 7) > .2 ? 1.6 : .1; });
+    nodes.forEach((n, i) => {
+      const mine = job !== undefined && jobSet.has(n), on = mine ? job > .02 : ord[i] < busy, k = mine ? 1.3 * job : 1;
+      n.led.material.emissive.setHex(mine ? C.tok : base[i]);
+      n.led.material.emissiveIntensity = on ? k * (1.6 + .4 * Math.sin(t * 4 + i)) : .05; n.dot.material.emissiveIntensity = on && Math.sin(t * 9 + i * 7) > .2 ? 1.6 : .1;
+    });
     walls.forEach(m => { m.material.transparent = xray > .01; m.material.opacity = 1 - .85 * xray; m.material.depthWrite = xray < .01; m.castShadow = xray < .5; });
   };
 
   const white = new THREE.Color(1, 1, 1), night = new THREE.Color(0x0a1228), warm = new THREE.Color(0xffb27a), gray = new THREE.Color(0x262c36), fog0 = new THREE.Color(0xb7c4d6);
   /** set sky, sun, stars and weather for hour h; storm 0..1, rain 0..1 */
-  S.set = (t, h, { storm = 0, rain = 0, cloud = null, flash = 0, camera, busy = .6, xray = 0 } = {}) => {
-    cluster(t, busy, xray);
+  S.set = (t, h, { storm = 0, rain = 0, cloud = null, flash = 0, camera, busy = .6, xray = 0, job } = {}) => {
+    cluster(t, busy, xray, job);
     const d = sunDir(h), el = d.y, day = clamp((el + .12) / .3), low = 1 - clamp(el / .35);
     S.sunL.position.copy(S.sunL.target.position).addScaledVector(d, 150);
     S.sunL.intensity = 2.6 * clamp(el * 5) * (1 - .85 * storm);
@@ -91,17 +97,19 @@ function world() {
   };
   return S;
 }
-const W0 = (shared) => {   // outro uses its own clean site, and this story's end line
-  shared.site ??= buildSite();
-  shared.endLine = '<span style="color:var(--sun)">One day.</span> <span style="color:#8090b0">·</span> <span style="color:var(--elec)">Every day.</span> <span style="color:#8090b0">·</span> <span style="color:#ffd9a0">Following the sun.</span>';
+const DAY_END = '<span style="color:var(--sun)">One day.</span> <span style="color:#8090b0">·</span> <span style="color:var(--elec)">Every day.</span> <span style="color:#8090b0">·</span> <span style="color:#ffd9a0">Following the sun.</span>';
+const W0 = (shared, endLine = DAY_END) => {   // outro uses its own clean site, and this story's end line
+  shared.site ??= buildSite(); shared.endLine = endLine;
   return shared.day ??= world();
 };
+/** the 32 CPU nodes of job 41827: all of Rack 91, then the top 12 of Rack 92 */
+const JOB_NODES = (row) => [...row.racks[0].nodes, ...row.racks[1].nodes.filter(n => n.type === 'cpu').slice(0, 12)];
 
 // ---------- overlay helpers ----------
 const clock = (h) => { const m = Math.floor(((h % 24) + 24) % 24 * 60), hh = Math.floor(m / 60); return `${(hh + 11) % 12 + 1}:${String(m % 60).padStart(2, '0')} ${hh < 12 ? 'AM' : 'PM'}`; };
-function header(id, h, title, op) {
+function header(id, h, title, op, kicker = 'One day at REPACSS') {
   ui.el(id + 'sc', '', '', 0, 0, op, { width: '1920px', height: '300px', background: 'linear-gradient(rgba(2,6,16,.7),rgba(2,6,16,0))', zIndex: -1 });
-  ui.el(id + 'k', 'kicker', 'One day at REPACSS', 90, 70, op);
+  ui.el(id + 'k', 'kicker', kicker, 90, 70, op);
   ui.el(id + 't', 'h1', `<span class="mono" style="color:var(--sun)">${clock(h)}</span>&nbsp;&nbsp;${title}`, 90, 104, op, { fontSize: '52px' });
 }
 /** 24-hour strip along the bottom: 4 AM → 4 AM, with the day's events */
@@ -188,8 +196,8 @@ export function dawn(sc, shared) {
 }
 
 // ---------- 1:50 PM, inside ----------
-export function noon(sc) {
-  const s = sc.s;
+/** the machine room: floor, the row of racks, UPS and a sunlit power bus to every rack */
+function room() {
   const scene = new THREE.Scene(); scene.background = new THREE.Color(0x05080f); scene.fog = new THREE.Fog(0x05080f, 25, 70);
   const camera = new THREE.PerspectiveCamera(40, 16 / 9, .05, 300);
   scene.add(new THREE.AmbientLight(0xa0b0d0, .5));
@@ -199,6 +207,12 @@ export function noon(sc) {
   const row = machineRow(); scene.add(row.group); const half = row.width / 2;
   const ups = new THREE.Mesh(new THREE.BoxGeometry(1.2, 2.2, 1.4), std(0x2d3a52, { metalness: .5 })); ups.position.set(half + 1.4, 1.1, 0); scene.add(ups);
   const bus = row.racks.map((rk, i) => { const f = flow(curve([half + .8, .15, .95], [rk.position.x + .3, .15, .95], [rk.position.x, .15, .7]), 40, C.sun, .22, 300 + i); scene.add(f); return f; });
+  return { scene, camera, row, half, bus };
+}
+export const kit = { W0, header, mixCard, dayBar, room, JOB_NODES };   // shared with job.js (main.js ignores non-scene exports)
+
+export function noon(sc) {
+  const s = sc.s, { scene, camera, row, half, bus } = room();
   const nodes = row.racks.flatMap(rk => rk.nodes), r = rng(4), order = nodes.map(() => r());
   const sunGlow = glowSprite(0xffc46b, 6, 0); sunGlow.position.set(half + 1.4, 2.6, 0); scene.add(sunGlow);
   const keys = [

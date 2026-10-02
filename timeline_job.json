@@ -1,0 +1,196 @@
+{
+ "total": 172.333,
+ "scenes": [
+  {
+   "id": "submit",
+   "start": 0.0,
+   "dur": 27.755,
+   "sentences": [
+    {
+     "start": 2.0,
+     "end": 5.985,
+     "text": "Eleven at night, somewhere on the Great Plains, a researcher presses enter."
+    },
+    {
+     "start": 6.335,
+     "end": 13.882,
+     "text": "The job is a drought model for the Ogallala aquifer, the vast underground water that farms from South Dakota to Texas depend on."
+    },
+    {
+     "start": 14.232,
+     "end": 20.583,
+     "text": "Through the NSF ACCESS program, it travels hundreds of miles, to a supercomputer that runs on sunlight."
+    },
+    {
+     "start": 20.933,
+     "end": 23.755,
+     "text": "This is the journey of job 41827."
+    }
+   ]
+  },
+  {
+   "id": "queue",
+   "start": 27.755,
+   "dur": 28.851,
+   "sentences": [
+    {
+     "start": 0.8,
+     "end": 4.348,
+     "text": "It lands in the Slurm queue at REPACSS, in Lubbock, Texas."
+    },
+    {
+     "start": 4.698,
+     "end": 9.003,
+     "text": "An ordinary scheduler would start it the moment enough nodes were free, day or night."
+    },
+    {
+     "start": 9.353,
+     "end": 12.066,
+     "text": "This one reads tomorrow's solar forecast first."
+    },
+    {
+     "start": 12.416,
+     "end": 19.925,
+     "text": "It packs the biggest jobs under the peak of the sunlight curve, slides flexible work into the shoulders, and keeps the night for work that cannot wait."
+    },
+    {
+     "start": 20.275,
+     "end": 27.351,
+     "text": "Job 41827 needs 32 nodes for six hours. The scheduler gives it a place in the sun, at ten in the morning."
+    }
+   ]
+  },
+  {
+   "id": "morning",
+   "start": 56.606,
+   "dur": 11.106,
+   "sentences": [
+    {
+     "start": 0.8,
+     "end": 5.738,
+     "text": "Ten o'clock. The solar array is climbing toward full power, and the job begins."
+    },
+    {
+     "start": 6.088,
+     "end": 9.806,
+     "text": "Thirty two nodes, more than eight thousand cores, wake up together."
+    }
+   ]
+  },
+  {
+   "id": "run",
+   "start": 67.711,
+   "dur": 22.135,
+   "sentences": [
+    {
+     "start": 0.8,
+     "end": 5.793,
+     "text": "Each node simulates its own slice of the plains: soil, rain, wells, and crops."
+    },
+    {
+     "start": 6.143,
+     "end": 13.484,
+     "text": "Over InfiniBand, the nodes trade the edges of their slices thousands of times a second, so the water can flow across the whole map."
+    },
+    {
+     "start": 13.834,
+     "end": 20.635,
+     "text": "And every node reports its power as it runs, so the energy behind this one result can be counted, watt by watt."
+    }
+   ]
+  },
+  {
+   "id": "overcast",
+   "start": 89.846,
+   "dur": 23.614,
+   "sentences": [
+    {
+     "start": 0.8,
+     "end": 5.442,
+     "text": "At one o'clock, a thick bank of clouds settles over the array, and it does not move."
+    },
+    {
+     "start": 5.792,
+     "end": 9.338,
+     "text": "The battery carries the load for a while, but the clouds outlast it."
+    },
+    {
+     "start": 9.688,
+     "end": 18.631,
+     "text": "So the scheduler makes a decision. Job 41827 saves its state to fast local NVMe on every node, and its nodes power down."
+    },
+    {
+     "start": 18.981,
+     "end": 22.114,
+     "text": "Nothing is lost. The job simply waits for the sun."
+    }
+   ]
+  },
+  {
+   "id": "resume",
+   "start": 113.46,
+   "dur": 15.407,
+   "sentences": [
+    {
+     "start": 0.8,
+     "end": 5.574,
+     "text": "Three fifteen. The clouds break up, and sunlight floods the array again."
+    },
+    {
+     "start": 5.924,
+     "end": 11.532,
+     "text": "The nodes power back on, read their checkpoints, and pick up at the exact time step where they stopped."
+    },
+    {
+     "start": 11.882,
+     "end": 13.907,
+     "text": "By evening, the run is complete."
+    }
+   ]
+  },
+  {
+   "id": "results",
+   "start": 128.867,
+   "dur": 16.695,
+   "sentences": [
+    {
+     "start": 0.8,
+     "end": 5.066,
+     "text": "The results travel back across the plains, to the researcher who asked the question."
+    },
+    {
+     "start": 5.416,
+     "end": 10.804,
+     "text": "A map of where the aquifer is most at risk, and of how much water careful irrigation could save."
+    },
+    {
+     "start": 11.154,
+     "end": 15.195,
+     "text": "Sunlight that fell on the High Plains, helping the High Plains keep their water."
+    }
+   ]
+  },
+  {
+   "id": "outro",
+   "start": 145.561,
+   "dur": 26.772,
+   "sentences": [
+    {
+     "start": 1.0,
+     "end": 7.524,
+     "text": "REPACSS is a production resource in the NSF ACCESS ecosystem, open to researchers across the country."
+    },
+    {
+     "start": 7.874,
+     "end": 17.069,
+     "text": "Every job it runs shows that advanced computing and variable energy can work together, accelerating discovery, reducing costs, and improving efficiency."
+    },
+    {
+     "start": 17.419,
+     "end": 22.272,
+     "text": "Somewhere tonight, another researcher is pressing enter. And tomorrow, the sun will be ready."
+    }
+   ]
+  }
+ ]
+}

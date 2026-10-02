@@ -56,6 +56,8 @@ STORY=one_day node render.mjs video         # also works with stills / zcheck
 .venv-tts/bin/python music.py one_day       # → build/REPACSS_one_day.mp4
 ```
 
+A third story, **The Journey of Job 41827** (about 3 min), follows one researcher's drought model for the Ogallala aquifer. The job is submitted at night from the Great Plains, scheduled into the solar window by a forecast-aware Slurm queue, and run on 32 nodes. It is checkpointed when clouds settle over the array and resumed when the sun returns, and the results are sent back. Its script is `JOB` in `narration.py` and its scenes are in `src/scenes/job.js`. Use the story id `job` (output: `build/REPACSS_job.mp4`).
+
 Previewing and checking:
 
 ```bash

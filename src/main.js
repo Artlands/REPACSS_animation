@@ -19,6 +19,7 @@ import schedule from './scenes/schedule.js';
 import checkpoint from './scenes/checkpoint.js';
 import outro from './scenes/outro.js';
 import * as day from './scenes/day.js';
+import * as job from './scenes/job.js';
 import { zcheck } from './zcheck.js';
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
@@ -35,7 +36,7 @@ composer.addPass(renderPass); composer.addPass(bloom); composer.addPass(new Outp
 
 const q = new URLSearchParams(location.search), STORY = q.get('story') || '';   // ?story=one_day
 const timeline = await (await fetch(`timeline${STORY ? '_' + STORY : ''}.json`, { cache: 'no-store' })).json();
-const builders = { intro, problem, site, energy, photon, compute, tokens, measure, remote, schedule, checkpoint, outro, ...day };
+const builders = { intro, problem, site, energy, photon, compute, tokens, measure, remote, schedule, checkpoint, outro, ...day, ...job };
 const shared = {};   // scenes may share objects (e.g. outro reuses the site)
 const scenes = timeline.scenes.map(sc => {
   const s = (i) => sc.sentences[Math.min(i, sc.sentences.length - 1)].start;
