@@ -48,6 +48,14 @@ node render.mjs video                  # 2. full render (~10 min on an M-series 
 .venv-tts/bin/python music.py          # 3. mix music → build/REPACSS_photons_to_tokens.mp4
 ```
 
+A second, 3-minute story, **One Day at REPACSS**, follows the site through a single summer day: pre-dawn, sunrise, solar noon in the machine room, a passing cloud, an evening storm with a grid outage, and wind at night. Its script is `ONE_DAY` in `narration.py` and its scenes are in `src/scenes/day.js`. Pass the story id to each step:
+
+```bash
+.venv-tts/bin/python narration.py one_day   # → timeline_one_day.json, build/narration_one_day.wav
+STORY=one_day node render.mjs video         # also works with stills / zcheck
+.venv-tts/bin/python music.py one_day       # → build/REPACSS_one_day.mp4
+```
+
 Previewing and checking:
 
 ```bash
@@ -56,7 +64,7 @@ node render.mjs video 180 240          # partial preview clip → build/preview_
 node render.mjs zcheck                 # report coplanar overlapping faces (z-fighting) per scene
 ```
 
-To scrub interactively, open `index.html` through any static server (for example `npx serve`) and add `?t=95` to show a single frame or `?play=95` to play from that time.
+To scrub interactively, open `index.html` through any static server (for example `npx serve`) and add `?t=95` (plus `&story=one_day` for the second story) to show a single frame or `?play=95` to play from that time.
 
 To tune the music, change the three numbers at the top of `music.py` (`BED_DB`, `DUCK_DB`, `SWELL_DB`), then rerun step 3.
 

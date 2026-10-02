@@ -9,6 +9,8 @@ import puppeteer from 'puppeteer-core';
 
 const FPS = 30, ROOT = path.dirname(new URL(import.meta.url).pathname);
 const [mode = 'stills', a1, a2] = process.argv.slice(2);
+// STORY=one_day node render.mjs ...  renders another story (timeline_one_day.json, build/*_one_day.*)
+const STORY = process.env.STORY || '', SFX = STORY ? '_' + STORY : '', NAME = STORY ? `REPACSS${SFX}` : 'REPACSS_photons_to_tokens';
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.wav': 'audio/wav', '.jpg': 'image/jpeg' };
 
 const server = http.createServer((req, res) => {
@@ -27,7 +29,7 @@ const page = await browser.newPage();
 page.on('console', m => m.type() === 'error' && console.error('[page]', m.text()));
 page.on('pageerror', e => console.error('[pageerror]', e.message));
 await page.setViewport({ width: 1920, height: 1080, deviceScaleFactor: 1 });
-await page.goto(`http://localhost:${port}/index.html`);
+await page.goto(`http://localhost:${port}/index.html?story=${STORY}`);
 await page.waitForFunction('window.ready === true', { timeout: 60000 });
 await page.evaluate(() => document.fonts.ready);
 const total = await page.evaluate('window.total');
@@ -44,15 +46,15 @@ if (mode === 'zcheck') {
 } else if (mode === 'stills') {
   fs.mkdirSync(path.join(ROOT, 'build/stills'), { recursive: true });
   for (const t of (a1 || '1').split(',').map(Number)) {
-    const out = path.join(ROOT, `build/stills/t${t.toFixed(1).padStart(6, '0')}.png`);
+    const out = path.join(ROOT, `build/stills/${STORY}t${t.toFixed(1).padStart(6, '0')}.png`);
     await shot(t, { path: out }); console.log(out);
   }
 } else {
   const from = +(a1 ?? 0), to = +(a2 ?? total), partial = a1 !== undefined;
-  const out = path.join(ROOT, partial ? `build/preview_${from}-${to}.mp4` : 'build/REPACSS_photons_to_tokens_nomusic.mp4');
+  const out = path.join(ROOT, partial ? `build/preview${SFX}_${from}-${to}.mp4` : `build/${NAME}_nomusic.mp4`);
   const args = ['-y', '-f', 'image2pipe', '-framerate', FPS, '-c:v', 'mjpeg', '-i', '-',
-    '-ss', from, '-t', to - from, '-i', 'build/narration.wav'];
-  if (!partial) args.push('-i', 'build/captions.srt', '-map', '0:v', '-map', '1:a', '-map', '2:s', '-c:s', 'mov_text', '-metadata:s:s:0', 'language=eng');
+    '-ss', from, '-t', to - from, '-i', `build/narration${SFX}.wav`];
+  if (!partial) args.push('-i', `build/captions${SFX}.srt`, '-map', '0:v', '-map', '1:a', '-map', '2:s', '-c:s', 'mov_text', '-metadata:s:s:0', 'language=eng');
   args.push('-c:v', 'libx264', '-preset', 'slow', '-crf', '17', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', out);
   const ff = spawn('ffmpeg', args.map(String), { cwd: ROOT, stdio: ['pipe', 'ignore', 'inherit'] });
   const n = Math.round((to - from) * FPS), t0 = Date.now();

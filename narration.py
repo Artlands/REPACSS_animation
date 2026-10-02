@@ -5,9 +5,10 @@ Voice: Qwen3-TTS 1.7B Base (Apache-2.0) via mlx-audio, cloned from one fixed ref
 Each sentence is synthesized separately so the animation can key visual beats to exact sentence start times.
 Every take is transcribed with Whisper and pitch-checked against the reference; takes that garble words,
 misread a number, or drift from the reference voice are re-rolled with a new seed.
-Usage: .venv-tts/bin/python narration.py            (reuses cached takes in build/tts unless the text changed)
+Usage: .venv-tts/bin/python narration.py [one_day]  (reuses cached takes in build/tts unless the text changed)
+The optional story id picks a script from STORIES and suffixes every output (timeline_one_day.json, ...).
 """
-import difflib, hashlib, json, os, re, wave
+import difflib, hashlib, json, os, re, sys, wave
 import numpy as np
 
 MODEL = "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-bf16"
@@ -110,6 +111,58 @@ SCRIPT = [
         "From photons, to electrons, to tokens. This is REPACSS.",
     ]),
 ]
+
+# "One Day at REPACSS": a 24-hour time-lapse of the site (scenes in src/scenes/day.js; outro reused)
+ONE_DAY = [
+    ("predawn", 2.0, 4.0, [
+        "Four thirty in the morning, on the high plains of West Texas.",
+        "The stars are still out over GLEAMM, the microgrid laboratory at the Reese Technology Center, ten miles west of Lubbock.",
+        "Inside, the REPACSS cluster never really sleeps.",
+        "All night it has run on the commercial grid and the West Texas wind, keeping only the work that cannot wait.",
+        "But today, like every day, it is waiting for the sun.",
+    ]),
+    ("dawn", 0.8, 1.5, [
+        "Six fifty. First light.",
+        "Before the sun clears the horizon, the scheduler has already read today's solar forecast: clear this morning, clouds after lunch, storms by evening.",
+        "It makes a plan, the way a farmer reads the sky.",
+        "As the 350 kilowatt array wakes up, the battery starts to fill, and the first big jobs are released into the queue.",
+    ]),
+    ("noon", 0.8, 1.5, [
+        "One fifty in the afternoon. Solar noon.",
+        "The array is near its peak, and the whole cluster opens up.",
+        "Thousands of cores run a weather simulation in parallel. On the GPUs, a language model answers questions, one token at a time.",
+        "Right now, the sun is paying for almost all of it.",
+        "And every watt is measured, node by node and code by code, so researchers can see exactly what their science costs.",
+    ]),
+    ("cloud", 0.8, 1.5, [
+        "Three thirty. The clouds arrive, right on schedule.",
+        "As they slide across the array, solar output falls by more than half in under a minute.",
+        "On an ordinary solar powered system, this is where jobs would have to stop, save their state, and wait.",
+        "Here, the 760 kilowatt-hour battery steps in and smooths the dip, and the cluster never notices.",
+        "The cloud passes. The battery recharges. The work goes on.",
+    ]),
+    ("storm", 0.8, 1.5, [
+        "Six twenty in the evening. The storm the forecast promised rolls in from the west.",
+        "Lightning strikes the utility line, and the grid goes dark.",
+        "For the first few seconds, the UPS carries every node.",
+        "Then the 500 kilowatt diesel generator roars to life and takes over the load.",
+        "The scheduler acts. Long jobs save their state to fast local NVMe, flexible work steps aside, and high priority work keeps running.",
+    ]),
+    ("night", 0.8, 1.5, [
+        "Ten at night. The storm has moved on, and the grid is back.",
+        "Behind it, the wind is still blowing, and the turbines on the horizon are turning.",
+        "The paused jobs restore and pick up exactly where they left off. Nothing was lost.",
+        "In one day, the cluster followed the sun, rode out a cloud, survived a storm, and never stopped computing.",
+    ]),
+    ("outro", 1.0, 4.5, [
+        "REPACSS is a production resource in the NSF ACCESS ecosystem, open to researchers across the country.",
+        "Every day it runs, it shows that advanced computing and variable energy can work together, accelerating discovery, reducing costs, and improving efficiency.",
+        "Tomorrow, the sun will rise again. And the computer will be ready to follow it.",
+    ]),
+]
+STORIES = {"photons": SCRIPT, "one_day": ONE_DAY}
+STORY = sys.argv[1] if len(sys.argv) > 1 else "photons"
+SFX = "" if STORY == "photons" else "_" + STORY
 
 # Spoken-form fixes so the TTS pronounces acronyms well. Display text keeps the original.
 SPOKEN = [
@@ -224,14 +277,14 @@ def main():
         pcm.extend(b"\0\0" * n)
         t += n / SR
 
-    for sid, lead, tail, sentences in SCRIPT:
+    for sid, lead, tail, sentences in STORIES[STORY]:
         start = t
         silence(lead)
         sents = []
         for i, s in enumerate(sentences):
             if i: silence(GAP)
             print(f"{sid}[{i}] {s[:70]}")
-            dur, frames = tts(s, f"build/tts/{sid}_{i}.wav")
+            dur, frames = tts(s, f"build/tts/{STORY + '_' if SFX else ''}{sid}_{i}.wav")
             sents.append({"start": round(t - start, 3), "end": round(t - start + dur, 3), "text": s})
             srt.append((t, t + dur, s))
             pcm.extend(frames)
@@ -239,10 +292,10 @@ def main():
         silence(tail)
         scenes.append({"id": sid, "start": round(start, 3), "dur": round(t - start, 3), "sentences": sents})
 
-    with wave.open("build/narration.wav", "wb") as w:
+    with wave.open(f"build/narration{SFX}.wav", "wb") as w:
         w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR); w.writeframes(bytes(pcm))
-    json.dump({"total": round(t, 3), "scenes": scenes}, open("timeline.json", "w"), indent=1)
-    with open("build/captions.srt", "w") as f:
+    json.dump({"total": round(t, 3), "scenes": scenes}, open(f"timeline{SFX}.json", "w"), indent=1)
+    with open(f"build/captions{SFX}.srt", "w") as f:
         for i, (a0, a1, s) in enumerate(srt, 1):
             f.write(f"{i}\n{srt_time(a0)} --> {srt_time(a1)}\n{s}\n\n")
     for s in scenes:

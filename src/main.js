@@ -18,6 +18,7 @@ import remote from './scenes/remote.js';
 import schedule from './scenes/schedule.js';
 import checkpoint from './scenes/checkpoint.js';
 import outro from './scenes/outro.js';
+import * as day from './scenes/day.js';
 import { zcheck } from './zcheck.js';
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
@@ -32,8 +33,9 @@ const renderPass = new RenderPass(new THREE.Scene(), new THREE.PerspectiveCamera
 const bloom = new UnrealBloomPass(new THREE.Vector2(W, H), .8, .5, .75);
 composer.addPass(renderPass); composer.addPass(bloom); composer.addPass(new OutputPass());
 
-const timeline = await (await fetch('timeline.json', { cache: 'no-store' })).json();
-const builders = { intro, problem, site, energy, photon, compute, tokens, measure, remote, schedule, checkpoint, outro };
+const q = new URLSearchParams(location.search), STORY = q.get('story') || '';   // ?story=one_day
+const timeline = await (await fetch(`timeline${STORY ? '_' + STORY : ''}.json`, { cache: 'no-store' })).json();
+const builders = { intro, problem, site, energy, photon, compute, tokens, measure, remote, schedule, checkpoint, outro, ...day };
 const shared = {};   // scenes may share objects (e.g. outro reuses the site)
 const scenes = timeline.scenes.map(sc => {
   const s = (i) => sc.sentences[Math.min(i, sc.sentences.length - 1)].start;
@@ -73,6 +75,5 @@ window.renderAt(0);
 window.ready = true;
 
 // interactive preview: index.html?t=12  or ?play
-const q = new URLSearchParams(location.search);
 if (q.has('t')) window.renderAt(+q.get('t'));
 if (q.has('play')) { const t0 = performance.now() - (+q.get('play') || 0) * 1000; const loop = () => { window.renderAt((performance.now() - t0) / 1000); requestAnimationFrame(loop); }; loop(); }

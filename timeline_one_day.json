@@ -1,0 +1,209 @@
+{
+ "total": 186.973,
+ "scenes": [
+  {
+   "id": "predawn",
+   "start": 0.0,
+   "dur": 29.866,
+   "sentences": [
+    {
+     "start": 2.0,
+     "end": 5.324,
+     "text": "Four thirty in the morning, on the high plains of West Texas."
+    },
+    {
+     "start": 5.674,
+     "end": 12.426,
+     "text": "The stars are still out over GLEAMM, the microgrid laboratory at the Reese Technology Center, ten miles west of Lubbock."
+    },
+    {
+     "start": 12.776,
+     "end": 15.998,
+     "text": "Inside, the REPACSS cluster never really sleeps."
+    },
+    {
+     "start": 16.348,
+     "end": 21.923,
+     "text": "All night it has run on the commercial grid and the West Texas wind, keeping only the work that cannot wait."
+    },
+    {
+     "start": 22.273,
+     "end": 25.866,
+     "text": "But today, like every day, it is waiting for the sun."
+    }
+   ]
+  },
+  {
+   "id": "dawn",
+   "start": 29.866,
+   "dur": 22.781,
+   "sentences": [
+    {
+     "start": 0.8,
+     "end": 2.557,
+     "text": "Six fifty. First light."
+    },
+    {
+     "start": 2.907,
+     "end": 11.322,
+     "text": "Before the sun clears the horizon, the scheduler has already read today's solar forecast: clear this morning, clouds after lunch, storms by evening."
+    },
+    {
+     "start": 11.672,
+     "end": 14.458,
+     "text": "It makes a plan, the way a farmer reads the sky."
+    },
+    {
+     "start": 14.808,
+     "end": 21.281,
+     "text": "As the 350 kilowatt array wakes up, the battery starts to fill, and the first big jobs are released into the queue."
+    }
+   ]
+  },
+  {
+   "id": "noon",
+   "start": 52.647,
+   "dur": 27.637,
+   "sentences": [
+    {
+     "start": 0.8,
+     "end": 3.459,
+     "text": "One fifty in the afternoon. Solar noon."
+    },
+    {
+     "start": 3.809,
+     "end": 6.98,
+     "text": "The array is near its peak, and the whole cluster opens up."
+    },
+    {
+     "start": 7.33,
+     "end": 15.341,
+     "text": "Thousands of cores run a weather simulation in parallel. On the GPUs, a language model answers questions, one token at a time."
+    },
+    {
+     "start": 15.691,
+     "end": 18.69,
+     "text": "Right now, the sun is paying for almost all of it."
+    },
+    {
+     "start": 19.04,
+     "end": 26.137,
+     "text": "And every watt is measured, node by node and code by code, so researchers can see exactly what their science costs."
+    }
+   ]
+  },
+  {
+   "id": "cloud",
+   "start": 80.284,
+   "dur": 29.071,
+   "sentences": [
+    {
+     "start": 0.8,
+     "end": 4.335,
+     "text": "Three thirty. The clouds arrive, right on schedule."
+    },
+    {
+     "start": 4.685,
+     "end": 9.882,
+     "text": "As they slide across the array, solar output falls by more than half in under a minute."
+    },
+    {
+     "start": 10.232,
+     "end": 16.629,
+     "text": "On an ordinary solar powered system, this is where jobs would have to stop, save their state, and wait."
+    },
+    {
+     "start": 16.979,
+     "end": 23.294,
+     "text": "Here, the 760 kilowatt-hour battery steps in and smooths the dip, and the cluster never notices."
+    },
+    {
+     "start": 23.644,
+     "end": 27.571,
+     "text": "The cloud passes. The battery recharges. The work goes on."
+    }
+   ]
+  },
+  {
+   "id": "storm",
+   "start": 109.356,
+   "dur": 27.986,
+   "sentences": [
+    {
+     "start": 0.8,
+     "end": 5.345,
+     "text": "Six twenty in the evening. The storm the forecast promised rolls in from the west."
+    },
+    {
+     "start": 5.695,
+     "end": 8.906,
+     "text": "Lightning strikes the utility line, and the grid goes dark."
+    },
+    {
+     "start": 9.256,
+     "end": 12.575,
+     "text": "For the first few seconds, the UPS carries every node."
+    },
+    {
+     "start": 12.925,
+     "end": 17.415,
+     "text": "Then the 500 kilowatt diesel generator roars to life and takes over the load."
+    },
+    {
+     "start": 17.765,
+     "end": 26.486,
+     "text": "The scheduler acts. Long jobs save their state to fast local NVMe, flexible work steps aside, and high priority work keeps running."
+    }
+   ]
+  },
+  {
+   "id": "night",
+   "start": 137.342,
+   "dur": 23.197,
+   "sentences": [
+    {
+     "start": 0.8,
+     "end": 4.35,
+     "text": "Ten at night. The storm has moved on, and the grid is back."
+    },
+    {
+     "start": 4.7,
+     "end": 9.103,
+     "text": "Behind it, the wind is still blowing, and the turbines on the horizon are turning."
+    },
+    {
+     "start": 9.453,
+     "end": 14.48,
+     "text": "The paused jobs restore and pick up exactly where they left off. Nothing was lost."
+    },
+    {
+     "start": 14.83,
+     "end": 21.697,
+     "text": "In one day, the cluster followed the sun, rode out a cloud, survived a storm, and never stopped computing."
+    }
+   ]
+  },
+  {
+   "id": "outro",
+   "start": 160.539,
+   "dur": 26.434,
+   "sentences": [
+    {
+     "start": 1.0,
+     "end": 7.524,
+     "text": "REPACSS is a production resource in the NSF ACCESS ecosystem, open to researchers across the country."
+    },
+    {
+     "start": 7.874,
+     "end": 17.114,
+     "text": "Every day it runs, it shows that advanced computing and variable energy can work together, accelerating discovery, reducing costs, and improving efficiency."
+    },
+    {
+     "start": 17.464,
+     "end": 21.934,
+     "text": "Tomorrow, the sun will rise again. And the computer will be ready to follow it."
+    }
+   ]
+  }
+ ]
+}

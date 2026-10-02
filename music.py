@@ -3,26 +3,31 @@
 Slow pad chords + soft plucked arpeggio + reverb. Level follows timeline.json: ducked under every sentence,
 lifted for the space opening, the haze dive into the site, and the closing logo.
 Remuxes the already-rendered video (video and subtitles copied, audio replaced) -- no re-render needed.
-Usage: .venv-tts/bin/python music.py      (after narration.py and `node render.mjs video`)
+Usage: .venv-tts/bin/python music.py [one_day]     (after narration.py and `node render.mjs video`)
 Input: build/REPACSS_photons_to_tokens_nomusic.mp4  ->  output: build/REPACSS_photons_to_tokens.mp4 (the final file)
 """
-import json, subprocess, wave
+import json, subprocess, sys, wave
 import numpy as np
 from scipy.signal import fftconvolve, resample_poly, butter, sosfilt
 
 SR = 48000
 BED_DB, DUCK_DB, SWELL_DB = -25, -11, 6     # bed level (dBFS RMS), extra cut under speech, lift in the swells
 # pitched to sit where laptop / phone speakers still reproduce it (pad ~196-740 Hz, plucks ~400-1500 Hz)
-SRC = "build/REPACSS_photons_to_tokens_nomusic.mp4"   # written by `node render.mjs video`
-OUT = "build/REPACSS_photons_to_tokens.mp4"
+STORY = sys.argv[1] if len(sys.argv) > 1 else ""
+SFX = "_" + STORY if STORY else ""
+NAME = f"REPACSS{SFX}" if STORY else "REPACSS_photons_to_tokens"
+SRC = f"build/{NAME}_nomusic.mp4"   # written by `node render.mjs video`
+OUT = f"build/{NAME}.mp4"
 
-tl = json.load(open("timeline.json"))
+tl = json.load(open(f"timeline{SFX}.json"))
 T = tl["total"]; N = int(T * SR); t = np.arange(N) / SR
 rng = np.random.default_rng(7)
 
 hz = lambda m: 440 * 2 ** ((m - 69) / 12)
 # D major-ish, slow: Dmaj9 - Bm11 - Gmaj9 - A6sus, 16 s per chord
 CHORDS = [[62, 69, 73, 76, 78], [59, 66, 69, 73, 76], [55, 62, 66, 69, 74], [57, 64, 69, 71, 76]]
+if STORY == "one_day":   # brighter, sunrise feel: Cmaj9 - Am9 - Fmaj7#11 - G6/9
+    CHORDS = [[60, 67, 71, 74, 76], [57, 64, 67, 71, 72], [53, 60, 64, 69, 71], [55, 62, 67, 69, 74]]
 CH = 16.0
 
 
@@ -77,11 +82,11 @@ def level():
         for s in sc["sentences"]:
             sp[int((sc["start"] + s["start"] - .25) * SR):int((sc["start"] + s["end"] + .15) * SR)] = True
     db = np.where(sp, DUCK_DB, 0.0)
-    sc = {s["id"]: s for s in tl["scenes"]}
-    first = sc["intro"]["sentences"][0]["start"]
-    dive0 = sc["intro"]["start"] + sc["intro"]["sentences"][-1]["end"]
-    dive1 = sc["site"]["start"] + sc["site"]["sentences"][0]["start"]
-    end0 = sc["outro"]["start"] + sc["outro"]["sentences"][-1]["end"]
+    s0, s1, last = tl["scenes"][0], tl["scenes"][1], tl["scenes"][-1]   # swell: opening, first scene change, end card
+    first = s0["sentences"][0]["start"]
+    dive0 = s0["start"] + s0["sentences"][-1]["end"]
+    dive1 = s1["start"] + s1["sentences"][0]["start"]
+    end0 = last["start"] + last["sentences"][-1]["end"]
     for a, b in ((0, first), (dive0, dive1), (end0, T)):
         db[int(a * SR):int(b * SR)] += SWELL_DB
     db = smooth(db, .35)
@@ -94,7 +99,7 @@ def main():
     m = sosfilt(butter(2, [160, 7000], btype="band", fs=SR, output="sos"), m)   # no sub-bass mud, soft top
     m *= 10 ** (BED_DB / 20) / np.sqrt((m ** 2).mean())
     m *= level()
-    with wave.open("build/narration.wav") as w:
+    with wave.open(f"build/narration{SFX}.wav") as w:
         v = np.frombuffer(w.readframes(w.getnframes()), "<i2").astype(np.float64) / 32768
     v = resample_poly(v, SR, w.getframerate())[:N]
     mix = m + np.pad(v, (0, N - len(v)))[None, :]
