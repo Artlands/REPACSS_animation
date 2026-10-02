@@ -77,3 +77,7 @@ Each scene builder receives its sentence start times (`sc.s(i)`), so camera move
 - Facility, cluster, node and network details come from REPACSS project materials. GLEAMM building and site layout follow REPACSS site photos and the [repacss.org gallery](https://www.repacss.org/gallery/).
 - Earth imagery: NASA Visible Earth, *Blue Marble: Next Generation* (July 2004), including a 240 px/degree crop over West Texas. City lights, clouds and ocean mask come from the three.js example textures (NASA-derived).
 - Harmonic-distortion profiles and per-code energy figures in the `measure` scene are illustrative and are labeled as such on screen.
+
+## License
+
+Code is released under the [MIT License](LICENSE). The REPACSS, Texas Tech and NSF names and logos in `assets/` are trademarks of their owners and are not covered by this license. The Earth imagery is NASA public-domain data.
