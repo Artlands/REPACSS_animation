@@ -1,5 +1,7 @@
 # REPACSS — From Photons to Tokens
 
+> **Branch `job-story`:** this branch adds two 3-minute stories next to the main video: *One Day at REPACSS* and *The Journey of Job 41827*. See [Branches](#branches) for the other variants.
+
 A 7-minute narrated explainer video for **REPACSS** (REmotely-managed Power Aware Computing Systems and Services) at Texas Tech University, supported by NSF Award 2404438.
 
 It follows energy from the sun to the GLEAMM microgrid at the Reese Technology Center, through the solar array, battery, generator and grid, into the REPACSS cluster, and out as AI tokens. It then covers the project's research challenges: power instrumentation, remote management, energy-aware scheduling, and checkpoint/restore.
@@ -9,6 +11,19 @@ It follows energy from the sun to the GLEAMM microgrid at the Reese Technology C
 **▶ Watch / download the video:** [REPACSS_photons_to_tokens.mp4 (release v1.0.0)](https://github.com/Artlands/REPACSS_animation/releases/download/v1.0.0/REPACSS_photons_to_tokens.mp4) — 7:00, 1080p, with captions. See all [releases](https://github.com/Artlands/REPACSS_animation/releases).
 
 Every frame is rendered from code. The scenes are written in [three.js](https://threejs.org), headless Chrome captures them frame by frame, and ffmpeg encodes the result. The narration is synthesized speech, and the music bed is generated in code.
+
+## Branches
+
+Each variant lives on its own branch, built on `main`.
+
+| Branch | What it adds |
+|---|---|
+| [`main`](https://github.com/Artlands/REPACSS_animation/tree/main) | *From Photons to Tokens*, the 7-minute narrated explainer |
+| [`one-day-story`](https://github.com/Artlands/REPACSS_animation/tree/one-day-story) | *One Day at REPACSS*, a 3-minute story of a single summer day at the site |
+| [`job-story`](https://github.com/Artlands/REPACSS_animation/tree/job-story) | *The Journey of Job 41827*, a 3-minute story of one research job. Built on `one-day-story`, so it has both stories |
+| [`follow-the-sun-scheduling-game`](https://github.com/Artlands/REPACSS_animation/tree/follow-the-sun-scheduling-game) | *Follow the Sun*, a browser game: run the facility for one day and schedule jobs around the sunlight |
+| [`photon-dash-3d-runner-game`](https://github.com/Artlands/REPACSS_animation/tree/photon-dash-3d-runner-game) | *Photon Dash*, a 3D runner from the Sun to tokens, with a narrated intro and a scoreboard |
+| [`hand-drawn-animation`](https://github.com/Artlands/REPACSS_animation/tree/hand-drawn-animation) | The main video restyled as chalk and pastel on dark paper |
 
 ## Pipeline
 
@@ -66,7 +81,7 @@ node render.mjs video 180 240          # partial preview clip → build/preview_
 node render.mjs zcheck                 # report coplanar overlapping faces (z-fighting) per scene
 ```
 
-To scrub interactively, open `index.html` through any static server (for example `npx serve`) and add `?t=95` (plus `&story=one_day` for the second story) to show a single frame or `?play=95` to play from that time.
+To scrub interactively, open `index.html` through any static server (for example `npx serve`) and add `?t=95` (plus `&story=one_day` or `&story=job` for the other stories) to show a single frame or `?play=95` to play from that time.
 
 To tune the music, change the three numbers at the top of `music.py` (`BED_DB`, `DUCK_DB`, `SWELL_DB`), then rerun step 3.
 
@@ -78,9 +93,12 @@ To tune the music, change the three numbers at the top of `music.py` (`BED_DB`, 
 | `src/lib.js` | Easing, overlay UI, sprites and particle flows; solar array and rack/cabinet builders (`RACKS` holds the per-rack node layout) |
 | `src/nodes.js` | Detailed server models: Dell R7625 CPU node, R760xa GPU node (4 × H100 NVL), R760xd2 storage node |
 | `src/scenes/*.js` | One file per scene, in story order: `intro` → `site` → `problem` → `energy` → `photon` → `compute` → `tokens` → `measure` → `remote` → `schedule` → `checkpoint` → `outro` |
+| `src/scenes/day.js` | All scenes of *One Day at REPACSS* |
+| `src/scenes/job.js` | All scenes of *The Journey of Job 41827* |
 | `src/zcheck.js` | Z-fighting detector used by `render.mjs zcheck` |
 | `narration.py` | The script (one entry per scene), spoken-form fixes, TTS and QA |
 | `timeline.json` | Generated: scene start times, durations and sentence times |
+| `timeline_one_day.json`, `timeline_job.json` | The same, for the other stories |
 | `assets/` | Logos, Earth textures, high-resolution Texas patch, TTS voice reference |
 | `build/` | Generated outputs (git-ignored) |
 
