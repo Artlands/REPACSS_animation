@@ -1,5 +1,7 @@
 # REPACSS — From Photons to Tokens
 
+> **Branch `hand-drawn-animation`:** this branch renders the main video in a hand-drawn style: chalk outlines and pastel fills on dark paper. See [Branches](#branches) for the other variants.
+
 A 7-minute narrated explainer video for **REPACSS** (REmotely-managed Power Aware Computing Systems and Services) at Texas Tech University, supported by NSF Award 2404438.
 
 It follows energy from the sun to the GLEAMM microgrid at the Reese Technology Center, through the solar array, battery, generator and grid, into the REPACSS cluster, and out as AI tokens. It then covers the project's research challenges: power instrumentation, remote management, energy-aware scheduling, and checkpoint/restore.
@@ -9,6 +11,19 @@ It follows energy from the sun to the GLEAMM microgrid at the Reese Technology C
 **▶ Watch / download the video:** [REPACSS_photons_to_tokens.mp4 (release v1.0.0)](https://github.com/Artlands/REPACSS_animation/releases/download/v1.0.0/REPACSS_photons_to_tokens.mp4) — 7:00, 1080p, with captions. See all [releases](https://github.com/Artlands/REPACSS_animation/releases).
 
 Every frame is rendered from code. The scenes are written in [three.js](https://threejs.org), headless Chrome captures them frame by frame, and ffmpeg encodes the result. The narration is synthesized speech, and the music bed is generated in code.
+
+## Branches
+
+Each variant lives on its own branch, built on `main`.
+
+| Branch | What it adds |
+|---|---|
+| [`main`](https://github.com/Artlands/REPACSS_animation/tree/main) | *From Photons to Tokens*, the 7-minute narrated explainer |
+| [`one-day-story`](https://github.com/Artlands/REPACSS_animation/tree/one-day-story) | *One Day at REPACSS*, a 3-minute story of a single summer day at the site |
+| [`job-story`](https://github.com/Artlands/REPACSS_animation/tree/job-story) | *The Journey of Job 41827*, a 3-minute story of one research job. Built on `one-day-story`, so it has both stories |
+| [`follow-the-sun-scheduling-game`](https://github.com/Artlands/REPACSS_animation/tree/follow-the-sun-scheduling-game) | *Follow the Sun*, a browser game: run the facility for one day and schedule jobs around the sunlight |
+| [`photon-dash-3d-runner-game`](https://github.com/Artlands/REPACSS_animation/tree/photon-dash-3d-runner-game) | *Photon Dash*, a 3D runner from the Sun to tokens, with a narrated intro and a scoreboard |
+| [`hand-drawn-animation`](https://github.com/Artlands/REPACSS_animation/tree/hand-drawn-animation) | The main video restyled as chalk and pastel on dark paper |
 
 ## Pipeline
 
@@ -59,6 +74,17 @@ node render.mjs zcheck                 # report coplanar overlapping faces (z-fi
 To scrub interactively, open `index.html` through any static server (for example `npx serve`) and add `?t=95` to show a single frame or `?play=95` to play from that time.
 
 To tune the music, change the three numbers at the top of `music.py` (`BED_DB`, `DUCK_DB`, `SWELL_DB`), then rerun step 3.
+
+## Hand-drawn style
+
+This branch draws every scene as if it were sketched on dark paper. The scenes and narration are the same as on `main`.
+
+- **Outlines.** A pre-pass renders view-space normals and depth, and edges come from that buffer, so lines follow the geometry and skip textures and text. Sprites, 3D text, glows, particles and lines are left unlined.
+- **Boil.** Outlines are offset by noise that changes 8 times a second, so they shimmer like hand-drawn animation. Fills move far less, which keeps labels readable.
+- **Fills.** Tones are posterized into a few bands, midtones get diagonal hatching, and pure black becomes textured paper.
+- **Overlay.** Hand lettering in Kalam (Google Fonts), uneven hand-drawn card borders, and an SVG displacement wobble synced to the boil. Logos and printed hardware labels stay crisp.
+
+The pipeline and commands are unchanged. A full render takes about 12 minutes, and because grain and outlines change every frame, the final MP4 is about 1 GB. The video linked above is the original look from `main`.
 
 ## Project layout
 
