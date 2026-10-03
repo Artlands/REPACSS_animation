@@ -21,8 +21,6 @@ Each variant lives on its own branch, built on `main`.
 | [`main`](https://github.com/Artlands/REPACSS_animation/tree/main) | *From Photons to Tokens*, the 7-minute narrated explainer |
 | [`one-day-story`](https://github.com/Artlands/REPACSS_animation/tree/one-day-story) | *One Day at REPACSS*, a 3-minute story of a single summer day at the site |
 | [`job-story`](https://github.com/Artlands/REPACSS_animation/tree/job-story) | *The Journey of Job 41827*, a 3-minute story of one research job. Built on `one-day-story`, so it has both stories |
-| [`follow-the-sun-scheduling-game`](https://github.com/Artlands/REPACSS_animation/tree/follow-the-sun-scheduling-game) | *Follow the Sun*, a browser game: run the facility for one day and schedule jobs around the sunlight |
-| [`photon-dash-3d-runner-game`](https://github.com/Artlands/REPACSS_animation/tree/photon-dash-3d-runner-game) | *Photon Dash*, a 3D runner from the Sun to tokens, with a narrated intro and a scoreboard |
 | [`hand-drawn-animation`](https://github.com/Artlands/REPACSS_animation/tree/hand-drawn-animation) | The main video restyled as chalk and pastel on dark paper |
 
 ## Pipeline
