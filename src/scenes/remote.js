@@ -7,11 +7,11 @@ const supply = (x) => 60 + 30 * Math.sin(x * .9) + 12 * Math.sin(x * 2.7 + 1) - 
 function drawDash(g, t, w, h) {
   g.fillStyle = 'rgba(6,14,32,0.92)'; g.fillRect(0, 0, w, h);
   g.strokeStyle = 'rgba(120,180,255,.5)'; g.lineWidth = 3; g.strokeRect(2, 2, w - 4, h - 4);
-  g.fillStyle = '#9fd6ff'; g.font = '600 30px Avenir Next, Helvetica'; g.fillText('REPACSS · LIVE TELEMETRY', 30, 50);
+  g.fillStyle = '#9fd6ff'; g.font = '700 30px Kalam, Avenir Next, Helvetica'; g.fillText('REPACSS · LIVE TELEMETRY', 30, 50);
   g.fillStyle = '#ff6b75'; g.beginPath(); g.arc(w - 40, 40, 9 + 2 * Math.sin(t * 6), 0, 7); g.fill();
   // panel 1: available renewable power vs cluster draw
   const px = 30, py = 80, pw = w * .58, ph = 250;
-  g.fillStyle = '#7f90b0'; g.font = '22px Avenir Next'; g.fillText('Solar supply vs. cluster power draw', px, py + 10);
+  g.fillStyle = '#7f90b0'; g.font = '22px Kalam, Avenir Next'; g.fillText('Solar supply vs. cluster power draw', px, py + 10);
   g.strokeStyle = 'rgba(255,255,255,.12)'; g.lineWidth = 1; for (let i = 0; i < 5; i++) { g.beginPath(); g.moveTo(px, py + 30 + i * 50); g.lineTo(px + pw, py + 30 + i * 50); g.stroke(); }
   const plot = (fn, color, lw) => { g.strokeStyle = color; g.lineWidth = lw; g.beginPath(); for (let i = 0; i <= 120; i++) { const x = t * .35 + i / 120 * 6; const y = py + 230 - fn(x) * 2; i ? g.lineTo(px + i / 120 * pw, y) : g.moveTo(px, y); } g.stroke(); };
   plot(supply, '#ffb53c', 4); plot(x => supply(x) * .88 - 4, '#b18cff', 4);

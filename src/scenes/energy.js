@@ -37,7 +37,7 @@ export default function energy(sc) {
   // ---- sources along the back (z = -8), one AC bus (z = -1), UPS and cluster in front right ----
   const SX = { solar: -18, wind: -10, grid: -3, gen: 10, batt: 18 }, SZ = -8;
   const label = (txt, sub, col, x, y, z) => { const a = textSprite(txt, { color: col, h: .75 }); a.position.set(x, y, z); scene.add(a);
-    const b = textSprite(sub, { color: '#aab6cc', h: .5, font: '400 96px "Avenir Next", Helvetica' }); b.position.set(x, y - .72, z); scene.add(b); return [a, b]; };
+    const b = textSprite(sub, { color: '#aab6cc', h: .5, font: '400 96px Kalam, "Avenir Next", Helvetica' }); b.position.set(x, y - .72, z); scene.add(b); return [a, b]; };
   const groups = {};
   // solar
   const pv = solarArray(3, 7, .55); pv.position.set(SX.solar - 3.2, 0, SZ - 3.2); scene.add(pv); groups.solar = pv;

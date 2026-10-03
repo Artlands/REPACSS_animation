@@ -70,9 +70,9 @@ export function glowSprite(color, size = 1, opacity = 1) {
 }
 
 /** text rendered into a sprite (always faces camera). h = world height */
-export function textSprite(text, { color = '#fff', h = 1, font = '600 96px "Avenir Next", Helvetica', bg = null, pad = 24, mono = false } = {}) {
+export function textSprite(text, { color = '#fff', h = 1, font = '600 96px Kalam, "Avenir Next", Helvetica', bg = null, pad = 24, mono = false } = {}) {
   const c = document.createElement('canvas'), g = c.getContext('2d');
-  if (mono) font = font.replace(/"Avenir Next", Helvetica/, 'Menlo, monospace');
+  if (mono) font = font.replace(/Kalam, "Avenir Next", Helvetica/, 'Menlo, monospace');
   g.font = font; const w = Math.ceil(g.measureText(text).width) + pad * 2;
   c.width = w; c.height = 140;
   g.font = font; g.textBaseline = 'middle'; g.textAlign = 'center';

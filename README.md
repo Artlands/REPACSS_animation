@@ -65,6 +65,7 @@ To tune the music, change the three numbers at the top of `music.py` (`BED_DB`, 
 | Path | Contents |
 |---|---|
 | `src/main.js` | Renderer, post-processing (bloom), scene switching and fades, `window.renderAt(t)` |
+| `src/sketch.js` | Hand-drawn look: normal/depth outline pre-pass and the final chalk-and-pastel shader (lines boil at 8 fps) |
 | `src/lib.js` | Easing, overlay UI, sprites and particle flows; solar array and rack/cabinet builders (`RACKS` holds the per-rack node layout) |
 | `src/nodes.js` | Detailed server models: Dell R7625 CPU node, R760xa GPU node (4 × H100 NVL), R760xd2 storage node |
 | `src/scenes/*.js` | One file per scene, in story order: `intro` → `site` → `problem` → `energy` → `photon` → `compute` → `tokens` → `measure` → `remote` → `schedule` → `checkpoint` → `outro` |

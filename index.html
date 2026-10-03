@@ -3,28 +3,29 @@
 <head>
 <meta charset="utf-8">
 <title>REPACSS — From Photons to Tokens</title>
-<link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@1,500;1,700&display=block" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Raleway:ital,wght@1,500;1,700&display=block" rel="stylesheet">
 <script type="importmap">
 { "imports": { "three": "./node_modules/three/build/three.module.js", "three/addons/": "./node_modules/three/examples/jsm/" } }
 </script>
 <style>
   :root { --sun:#ffb53c; --elec:#3fd8ff; --tok:#b18cff; --red:#e0202f; --ink:#eef3ff; --dim:#9fb0cc; }
   html, body { margin:0; background:#04060d; overflow:hidden; }
-  #stage { position:relative; width:1920px; height:1080px; overflow:hidden; font-family:"Avenir Next","Helvetica Neue",Helvetica,sans-serif; color:var(--ink); }
+  #stage { position:relative; width:1920px; height:1080px; overflow:hidden; font-family:Kalam,"Avenir Next",sans-serif; color:var(--ink); }
   #stage canvas { position:absolute; inset:0; }
   #ui { position:absolute; inset:0; pointer-events:none; isolation:isolate; }
+  #ui > div:not(:has(img)) { filter:url(#rough); }   /* hand wobble on text and boxes; logos stay crisp */
   #ui > div { position:absolute; white-space:nowrap; }
   #fade { position:absolute; inset:0; background:#000; pointer-events:none; }
-  .h1 { font-weight:600; letter-spacing:-.005em; text-shadow:0 2px 24px rgba(0,0,0,.55); }
+  .h1 { font-weight:700; letter-spacing:-.005em; text-shadow:0 2px 24px rgba(0,0,0,.55); }
   .kicker { font-size:17px; font-weight:600; letter-spacing:.42em; text-transform:uppercase; color:var(--sun); display:flex; align-items:center; gap:14px; }
-  .kicker::before { content:""; width:36px; height:1px; background:currentColor; opacity:.8; }
+  .kicker::before { content:""; width:36px; height:2px; background:currentColor; opacity:.8; border-radius:2px; transform:rotate(-2deg); }
   .sub { font-size:26px; color:var(--dim); font-weight:400; letter-spacing:.01em; }
-  .chip { font-size:22px; font-weight:500; padding:10px 18px; border-radius:999px; background:rgba(10,14,24,.5); border:1px solid rgba(255,255,255,.12); backdrop-filter:blur(14px); }
+  .chip { font-size:22px; font-weight:500; padding:10px 18px; border-radius:255px 25px 225px 25px/25px 225px 25px 255px; background:rgba(14,16,22,.72); border:2px solid rgba(240,235,220,.55); }
   .lab { font-size:20px; font-weight:600; letter-spacing:.01em; transform:translate(-50%,-100%); text-align:center; text-shadow:0 1px 10px rgba(0,0,0,.9); }
   .lab small { display:block; font-size:16px; font-weight:400; color:#c4cee0; margin-top:2px; }
-  .lab::after { content:""; display:block; width:1px; height:40px; margin:8px auto 0; background:linear-gradient(currentColor,transparent); opacity:.9; }
-  .card { padding:22px 28px; border-radius:14px; background:linear-gradient(160deg,rgba(18,24,40,.62),rgba(8,12,22,.5)); border:1px solid rgba(255,255,255,.09); box-shadow:0 20px 50px rgba(0,0,0,.35); backdrop-filter:blur(16px); }
-  .card .big { font-size:52px; font-weight:600; line-height:1; letter-spacing:-.01em; }
+  .lab::after { content:""; display:block; width:2px; height:40px; margin:8px auto 0; background:linear-gradient(currentColor,transparent); transform:rotate(3deg); opacity:.9; }
+  .card { padding:22px 28px; border-radius:255px 18px 225px 18px/18px 225px 18px 255px; background:rgba(14,16,22,.78); border:2px solid rgba(240,235,220,.6); box-shadow:3px 4px 0 rgba(240,235,220,.12); }
+  .card .big { font-size:52px; font-weight:700; line-height:1; letter-spacing:-.01em; }
   .card .cap { font-size:15px; color:var(--dim); margin-top:10px; letter-spacing:.18em; text-transform:uppercase; font-weight:500; }
   .mono { font-family:"SF Mono",Menlo,monospace; }
   .slogan { font-family:Raleway,"Avenir Next",sans-serif; font-style:italic; font-weight:700; line-height:1.18; color:#f2f4f8; }
@@ -34,6 +35,7 @@
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute"><filter id="rough"><feTurbulence id="turb" type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="0"/><feDisplacementMap in="SourceGraphic" scale="2.5" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
 <div id="stage"><div id="vignette"></div><img id="bug" src="assets/repacss-white.svg"><div id="ui"></div><div id="fade"></div></div>
 <script type="module" src="src/main.js"></script>
 </body>

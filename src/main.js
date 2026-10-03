@@ -4,6 +4,8 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { SketchShader, renderNormals } from './sketch.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { W, H, ui, clamp } from './lib.js';
 import intro from './scenes/intro.js';
@@ -30,8 +32,12 @@ document.getElementById('stage').prepend(renderer.domElement);
 const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(W, H, { samples: 4, type: THREE.HalfFloatType }));
 const renderPass = new RenderPass(new THREE.Scene(), new THREE.PerspectiveCamera());
 const bloom = new UnrealBloomPass(new THREE.Vector2(W, H), .8, .5, .75);
-composer.addPass(renderPass); composer.addPass(bloom); composer.addPass(new OutputPass());
+const normals = new THREE.WebGLRenderTarget(W, H, { type: THREE.HalfFloatType });
+const sketch = new ShaderPass(SketchShader); sketch.uniforms.res.value = new THREE.Vector2(W, H); sketch.uniforms.tNormal.value = normals.texture;
+composer.addPass(renderPass); composer.addPass(bloom); composer.addPass(new OutputPass()); composer.addPass(sketch);
 
+// canvas text (3D labels) is drawn while scenes build, so the hand font must be ready first
+await Promise.all(['400 96px Kalam', '700 96px Kalam'].map(f => document.fonts.load(f)));
 const timeline = await (await fetch('timeline.json', { cache: 'no-store' })).json();
 const builders = { intro, problem, site, energy, photon, compute, tokens, measure, remote, schedule, checkpoint, outro };
 const shared = {};   // scenes may share objects (e.g. outro reuses the site)
@@ -42,7 +48,7 @@ const scenes = timeline.scenes.map(sc => {
 // soft studio reflections for every scene's metals and glass
 const envTex = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture;
 for (const sc of scenes) { const s3 = sc.obj.scene; if (!s3.environment) { s3.environment = envTex; s3.environmentIntensity = sc.obj.env ?? .45; } }
-const fade = document.getElementById('fade'), bug = document.getElementById('bug');
+const fade = document.getElementById('fade'), bug = document.getElementById('bug'), turb = document.getElementById('turb');
 
 window.total = timeline.total;
 window.renderAt = (t) => {
@@ -55,6 +61,9 @@ window.renderAt = (t) => {
   bloom.strength = (b.strength ?? .8) * .35; bloom.radius = .35; bloom.threshold = Math.max(.9, b.threshold ?? .9);
   renderer.toneMappingExposure = o.exposure ?? 1;
   renderPass.scene = o.scene; renderPass.camera = o.camera;
+  renderNormals(renderer, o.scene, o.camera, normals);
+  const boil = Math.floor(t * 8);   // hand-drawn lines re-drawn 8×/s
+  sketch.uniforms.seed.value = boil % 64; turb.setAttribute('seed', boil % 64);
   composer.render();
   ui.end();
   // dip to black between scenes
