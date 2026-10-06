@@ -82,7 +82,7 @@ To tune the music, change the three numbers at the top of `music.py` (`BED_DB`, 
 | `src/zcheck.js` | Z-fighting detector used by `render.mjs zcheck` |
 | `narration.py` | The script (one entry per scene), spoken-form fixes, TTS and QA |
 | `timeline.json` | Generated: scene start times, durations and sentence times |
-| `assets/` | Logos, Earth textures, high-resolution Texas patch, TTS voice reference |
+| `assets/` | Logos, Earth textures, high-resolution Texas patch, NAIP aerial imagery around GLEAMM, TTS voice reference |
 | `build/` | Generated outputs (git-ignored) |
 
 Each scene builder receives its sentence start times (`sc.s(i)`), so camera moves, labels and cards stay locked to the narration. After changing the script, rerun the pipeline and the visuals follow the new timing.
@@ -91,8 +91,9 @@ Each scene builder receives its sentence start times (`sc.s(i)`), so camera move
 
 - Facility, cluster, node and network details come from REPACSS project materials. GLEAMM building and site layout follow REPACSS site photos and the [repacss.org gallery](https://www.repacss.org/gallery/).
 - Earth imagery: NASA Visible Earth, *Blue Marble: Next Generation* (July 2004), including a 240 px/degree crop over West Texas. City lights, clouds and ocean mask come from the three.js example textures (NASA-derived).
+- Aerial imagery: USDA National Agriculture Imagery Program (NAIP) orthophotos via the USGS National Map `USGSNAIPImagery` service, public domain. Three patches centred on the GLEAMM building (33.61229° N, 102.04853° W): 100 km and 4 km squares for the end of the intro's zoom, and a 1.2 km square at 0.4 m/px that forms the ground of the site scene.
 - Harmonic-distortion profiles and per-code energy figures in the `measure` scene are illustrative and are labeled as such on screen.
 
 ## License
 
-Code is released under the [MIT License](LICENSE). The REPACSS, Texas Tech and NSF names and logos in `assets/` are trademarks of their owners and are not covered by this license. The Earth imagery is NASA public-domain data.
+Code is released under the [MIT License](LICENSE). The REPACSS, Texas Tech and NSF names and logos in `assets/` are trademarks of their owners and are not covered by this license. The Earth imagery is NASA public-domain data, and the aerial imagery is USDA NAIP public-domain data.

@@ -94,7 +94,7 @@ export default function photon(sc) {
   box(.9, 2.6, .9, 0x2a3140, V(9, 1.3, 0), 'PDU');
   box(1.2, 2.2, 1.2, 0x2d3a52, V(5, 1.1, 0), 'UPS');
   // battery + generator appear when the narration brings them onto the bus
-  for (const [w, h, d, col, pos, txt] of [[2.6, 1.8, 1.6, 0xe9e3d2, V(-4, .9, -7), 'Battery · 550 kWh'], [3, 1.8, 1.4, 0xe4e4df, V(-4, .9, -13), 'Generator · 500 kW']]) { box(w, h, d, col, pos, txt); backup.push(...Cg.children.slice(-2)); }
+  for (const [w, h, d, col, pos, txt] of [[2.6, 1.8, 1.6, 0xe9e3d2, V(-6, .9, -7), 'Battery · 550 kWh'], [3, 1.8, 1.4, 0xe4e4df, V(6.5, .9, -8), 'Generator · 500 kW']]) { box(w, h, d, col, pos, txt); backup.push(...Cg.children.slice(-2)); }
   const rk = rack(); rk.position.set(15, 0, 0); Cg.add(rk);
   const rkT = textSprite('Server rack', { color: '#fff', h: .5 }); rkT.position.set(15, rk.height + .6, 0); Cg.add(rkT);
   // redundant PSUs on the rear of one node
@@ -117,8 +117,8 @@ export default function photon(sc) {
     [curve([0, 7.6, -27], [0, 7.4, -19], [0, 7.6, -10], [0, 2.4, -.7]), 0xe4e8f0],
     [cable([1.6, .3, .2], [4.4, .3, .2], .6), C.sun],
     [cable([5.6, .3, .2], [8.6, .3, .2], .6), C.sun],
-    [cable([-2.7, .3, -7], [-1.2, .3, -.7], .5), 0x7dffa5],
-    [cable([-2.5, .3, -13], [-1.2, .3, -.7], .7), 0xffb07a],
+    [cable([-4.7, .3, -7], [-1.2, .3, -.7], .5), 0x7dffa5],
+    [cable([5, .3, -8], [1.2, .3, -.7], .7), 0xffb07a],
     [cable([9.4, .3, .2], [14.5, .3, -.4], .6), C.sun],
   ].map(([cv, col], i) => { const f = flow(cv, 40, col, .5, 40 + i), tb = tube(cv, col, .05, .3); Cg.add(f, tb); if (i >= 5) backup.push(tb); return f; });
 
@@ -134,6 +134,8 @@ export default function photon(sc) {
     [sc.s(6) - .3, V(C0.x - 9, 6, 15), V(C0.x - 10, 2, 0)],
     [sc.s(6) + 2.5, V(C0.x + 8, 9, 14), V(C0.x, 3, -8)],
     [sc.s(7) + .2, V(C0.x + 6, 6, 13), V(C0.x + 11, 1.8, 0)],
+    [sc.s(7) + 1.6, V(C0.x + 7, 5.5, 12), V(C0.x + 12, 1.8, 0)],
+    [sc.s(7) + 1.65, V(C0.x + 13.5, 4, -8.5), V(C0.x + 15, 1.6, -.6)],   // cut to the rear of the rack (no fly-through)
     [sc.s(7) + 3.5, V(C0.x + 12.4, 3.4, -6.5), V(C0.x + 15, 1.6, -.6)],
     [sc.dur, V(C0.x + 12.9, 3, -5.6), V(C0.x + 15, 1.6, -.6)],
   ];

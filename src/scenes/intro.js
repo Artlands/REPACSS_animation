@@ -1,11 +1,12 @@
 // Cold open: the sun and the Earth, a photon crossing between them, the title card, then a dive into West Texas.
 // Earth textures: NASA Blue Marble / Black Marble derived maps (three.js examples).
+// Final approach: USDA NAIP aerial imagery (public domain, via USGS The National Map) in two patches centred on GLEAMM.
 import * as THREE from 'three';
-import { C, ui, ramp, win, rng, glowSprite, curve, V, camPath, vlerp } from '../lib.js';
+import { C, ui, ramp, win, rng, glowSprite, curve, V, camPath, vlerp, ease, clamp } from '../lib.js';
 
 const load = (f) => new THREE.TextureLoader().loadAsync('assets/' + f).then(t => { t.anisotropy = 16; return t; });
-const [dayTex, nightTex, cloudTex, specTex, texasTex] = await Promise.all(['earth_bm_5400.jpg', 'earth_lights_2048.png', 'earth_clouds_2048.png', 'earth_specular_2048.jpg', 'texas_bm_240ppd.jpg'].map(load));
-dayTex.colorSpace = nightTex.colorSpace = cloudTex.colorSpace = texasTex.colorSpace = THREE.SRGBColorSpace;
+const [dayTex, nightTex, cloudTex, specTex, texasTex, naip100, naip4] = await Promise.all(['earth_bm_5400.jpg', 'earth_lights_2048.png', 'earth_clouds_2048.png', 'earth_specular_2048.jpg', 'texas_bm_240ppd.jpg', 'reese_naip_100km.jpg', 'reese_naip_4km.jpg'].map(load));
+dayTex.colorSpace = nightTex.colorSpace = cloudTex.colorSpace = texasTex.colorSpace = naip100.colorSpace = naip4.colorSpace = THREE.SRGBColorSpace;
 const TEXAS = new THREE.Vector4(-110, -94, 27, 40);   // lon0, lon1, lat0, lat1 of the 240 px/deg NASA Blue Marble patch
 
 const R = 10;
@@ -14,7 +15,11 @@ export const ll = (lat, lon, r = R) => {
   const phi = (lon + 180) / 360 * Math.PI * 2, th = (90 - lat) * Math.PI / 180;
   return V(-Math.cos(phi) * Math.sin(th) * r, Math.cos(th) * r, Math.sin(phi) * Math.sin(th) * r);
 };
-const TTU = [33.584, -101.875], GLEAMM = [33.597, -102.047];
+// GLEAMM building at the NW corner of the Reese airfield (from NAIP imagery); TTU campus ~16 km (10 mi) east
+const TTU = [33.584, -101.875], GLEAMM = [33.61229, -102.04853];
+const KM = R / 6371;
+const RAD = Math.PI / 180, hav = (a, b) => 2 * 6371 * Math.asin(Math.sqrt(Math.sin((b[0] - a[0]) * RAD / 2) ** 2 + Math.cos(a[0] * RAD) * Math.cos(b[0] * RAD) * Math.sin((b[1] - a[1]) * RAD / 2) ** 2));
+const DIST_KM = hav(GLEAMM, TTU);   // ≈ 16.4 km ≈ 10.2 mi
 
 export default function intro(sc) {
   const s = sc.s;
@@ -79,6 +84,22 @@ export default function intro(sc) {
   }));
   earth.add(atmo);
 
+  // aerial-photo patches tangent to the globe at GLEAMM (square in metres, north up), edges feathered into the globe map
+  const up0 = ll(...GLEAMM).normalize(), east0 = ll(GLEAMM[0], GLEAMM[1] + .01).sub(ll(...GLEAMM)).normalize(), north0 = ll(GLEAMM[0] + .01, GLEAMM[1]).sub(ll(...GLEAMM)).normalize();
+  const patch = (map, halfKm, lift, order) => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(2 * halfKm * KM, 2 * halfKm * KM), new THREE.ShaderMaterial({
+      uniforms: { map: { value: map }, sunDir: { value: sunDir }, nrm: { value: V(0, 0, 0) }, tint: { value: new THREE.Color(1, 1, 1) }, fade: { value: 1 } }, transparent: true, depthWrite: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2 * order, polygonOffsetUnits: -4 * order,
+      vertexShader: 'varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }',
+      fragmentShader: `uniform sampler2D map; uniform vec3 sunDir, nrm, tint; uniform float fade; varying vec2 vUv;
+        void main(){ float nd=dot(nrm,sunDir); vec3 c=texture2D(map,vUv).rgb*tint*(.04+1.25*max(nd,0.));
+          float e=smoothstep(0.,.18,min(min(vUv.x,1.-vUv.x),min(vUv.y,1.-vUv.y))); gl_FragColor=vec4(c,e*fade); }`,
+    }));
+    m.matrixAutoUpdate = false; m.matrix.makeBasis(east0, north0, up0).setPosition(up0.clone().multiplyScalar(R + lift)); m.renderOrder = order;
+    spin.add(m); return m;
+  };
+  const patches = [patch(naip100, 50, 1e-6, 1), patch(naip4, 2, 2e-6, 2)];
+  const BM_TINT = new THREE.Color(.66, .59, .36);   // NAIP mean colour → Blue Marble mean colour over the same 100 km (linear)
+
   // a photon travels sun -> Earth
   const pPath = curve([SUN.x + 20, SUN.y, SUN.z], [-120, 22, -90], target.clone().multiplyScalar(R * 1.02).toArray());
   const photon = glowSprite(0xfff1b8, 5); scene.add(photon);
@@ -86,27 +107,40 @@ export default function intro(sc) {
 
   // pins (world positions resolved every frame because the globe spins)
   const pin = glowSprite(0xff3040, .25); scene.add(pin);
+  const ttuPin = glowSprite(0xffffff, .25); scene.add(ttuPin);
   const pinW = V(0, 0, 0), ttuW = V(0, 0, 0);
+  // globe spin eases to a stop at the end of the scene so the final approach lands still
+  const rotAt = (t) => { const T = sc.dur - t; return -.012 * (T > 6 ? T - 3 : T * T / 12); };
+  const dirAt = (p, t) => ll(...p).normalize().applyAxisAngle(V(0, 1, 0), rotAt(t)).applyQuaternion(earth.quaternion);
 
   // camera: wide two-shot, slow push, then the dive toward Lubbock
   const surfDir = target, tan = V(0, 1, 0).cross(surfDir).normalize();
-  const above = (alt, side = 0, up = 0) => surfDir.clone().multiplyScalar(R + alt).add(tan.clone().multiplyScalar(side)).add(V(0, up, 0));
+  const above = (alt, side = 0, up = 0, d = surfDir) => d.clone().multiplyScalar(R + alt).add(V(0, 1, 0).cross(d).normalize().multiplyScalar(side)).add(V(0, up, 0));
+  // from t0 the camera follows the GLEAMM point down; log-altitude keys: 4.2 (~2700 km) → .06 (~38 km), a slow hold while
+  // Texas Tech and the distance are shown, then down to .004 (~2.5 km)
+  const t0 = s(5) + 2.5, A0 = 4.2;
+  const altKeys = [[t0, A0], [t0 + 3, .06], [t0 + 5.4, .042], [sc.dur, .004]].map(([tk, a]) => [tk, Math.log(a)]);
+  const altAt = (t) => { let i = 0; while (i < altKeys.length - 2 && t > altKeys[i + 1][0]) i++;
+    const [ta, la] = altKeys[i], [tb, lb] = altKeys[i + 1]; return Math.exp(la + (lb - la) * ease((t - ta) / (tb - ta))); };
   const keys = [
     [0, V(40, 14, 150), V(-120, 8, -20)],
     [s(2) + 1, V(36, 13, 140), V(-108, 6, -12)],
     [s(3) + 1, V(-10, 12, 62), V(-20, 4, 0)],
     [s(4) + 1.5, above(28, 8, 2), tan.clone().multiplyScalar(-9)],
-    [s(5) + 2.5, above(4.2, 1, 1.4), surfDir.clone().multiplyScalar(R)],
-    [s(5) + 5.5, above(1.0, .1, .35), surfDir.clone().multiplyScalar(R)],
-    [sc.dur, above(.25, 0, .06), surfDir.clone().multiplyScalar(R)],
+    [t0, above(A0, 1, 1.4, dirAt(GLEAMM, t0)), dirAt(GLEAMM, t0).multiplyScalar(R)],
   ];
 
   function update(t) {
-    camPath(camera, t, keys);
-    spin.rotation.y = -(sc.dur - t) * .012;
+    spin.rotation.y = rotAt(t);
+    const gd = dirAt(GLEAMM, t);
+    if (t < t0) camPath(camera, t, keys);
+    else { const alt = altAt(t), k = alt / A0; camera.position.copy(above(alt, k, 1.4 * k, gd)); camera.lookAt(gd.clone().multiplyScalar(R)); }
     surf.material.uniforms.cloudShift.value = t * .0004;
     // keep depth precision: near plane follows the altitude
-    const alt = camera.position.length() - R; camera.near = Math.min(.5, Math.max(.002, alt * .25)); camera.updateProjectionMatrix();
+    const alt = camera.position.length() - R; camera.near = clamp(alt * .25, 2e-4, .5); camera.far = alt < .6 ? 40 : 4000; camera.updateProjectionMatrix();
+    // patches fade in on the way down, carrying the Blue Marble colour at first and their own colour near the ground
+    const hi = clamp((alt - .08) / .7);
+    patches.forEach(p => { const u = p.material.uniforms; u.nrm.value.copy(gd); u.fade.value = clamp((1.4 - alt) / .8); u.tint.value.setRGB(1, 1, 1).lerp(BM_TINT, hi); });
     corona.material.opacity = .85 + .1 * Math.sin(t * 1.7);
     // photon: launches with sentence 2, lands as it ends
     const pt = ramp(t, s(2) + .4, 4.2), live = pt > 0 && pt < 1;
@@ -114,9 +148,19 @@ export default function intro(sc) {
     trail.forEach((tr, i) => { pPath.getPointAt(Math.max(0, pt - i * .008), tr.position); tr.visible = live; });
     // pins
     surf.updateMatrixWorld(true);
-    pinW.copy(ll(...GLEAMM, R * 1.0015)).applyMatrix4(surf.matrixWorld); ttuW.copy(ll(...TTU, R * 1.0015)).applyMatrix4(surf.matrixWorld);
+    const ph = R + Math.min(.015, alt * .02);   // pins float just above the ground, closer as the camera descends
+    pinW.copy(gd).multiplyScalar(ph); ttuW.copy(dirAt(TTU, t)).multiplyScalar(ph);
     pin.position.copy(pinW); const pinOn = ramp(t, s(5) + 2, 1);
     pin.material.opacity = pinOn; pin.scale.setScalar(camera.position.distanceTo(pinW) * .03 * (1 + .25 * Math.sin(t * 5)));
+    const ttuOn = clamp(Math.min((.1 - alt) / .03, (alt - .02) / .008));   // Texas Tech + distance shown around the hold (~60 → 13 km)
+    if (ttuOn > 0) {   // dashed screen-space line GLEAMM ↔ Texas Tech
+      camera.updateMatrixWorld();   // project with this frame's camera, not last frame's
+      const sp = (w) => { const p = w.clone().project(camera); return [(p.x * .5 + .5) * 1920, (-p.y * .5 + .5) * 1080]; };
+      const [ax, ay] = sp(pinW), [bx, by] = sp(ttuW);
+      ui.el('i-dl', '', `<svg width="1920" height="1080"><line x1="${ax}" y1="${ay}" x2="${bx}" y2="${by}" stroke="#ffd27a" stroke-width="3" stroke-dasharray="14 10" stroke-linecap="round"/><circle cx="${ax}" cy="${ay}" r="7" fill="#ff3040"/><circle cx="${bx}" cy="${by}" r="7" fill="#fff"/></svg>`, 0, 0, ttuOn, { zIndex: -1 });
+      ui.el('i-dist', 'sub', `${DIST_KM.toFixed(1)} km · ${(DIST_KM / 1.609).toFixed(1)} miles`, (ax + bx) / 2, (ay + by) / 2 + 18, ttuOn, { color: '#ffd27a', fontSize: '26px', fontWeight: '600', transform: 'translateX(-50%)', textShadow: '0 1px 10px rgba(0,0,0,.9)', whiteSpace: 'nowrap' });
+    }
+    ttuPin.position.copy(ttuW); ttuPin.material.opacity = ttuOn; ttuPin.scale.setScalar(camera.position.distanceTo(ttuW) * .02);
 
     // overlay
     const o1 = win(t, .4, s(3) - .4, .8);
@@ -133,7 +177,9 @@ export default function intro(sc) {
     // dive: place names
     const dv = ramp(t, s(5) + .4, 1);
     ui.label('i-tx', 'West Texas<small>Southern High Plains</small>', ll(35.2, -101.0, R).applyMatrix4(surf.matrixWorld), camera, dv * (1 - ramp(t, s(5) + 4.4, .8)), '#e8eefc');
-    ui.label('i-gl', 'GLEAMM · REPACSS<small>10 miles west of Texas Tech, Lubbock</small>', pinW, camera, win(t, s(5) + 2.4, sc.dur - 1.6, .6), '#ff8a94');
+    ui.label('i-gl', 'GLEAMM · REPACSS<small>Reese Technology Center</small>', pinW, camera, win(t, s(5) + 2.4, sc.dur - 1.6, .6), '#ff8a94');
+    ui.label('i-ttu', 'Texas Tech University<small>Lubbock</small>', ttuW, camera, ttuOn, '#e8eefc');
+
     // atmospheric haze hands off to the site's aerial shot
     ui.el('i-haze', '', '', 0, 0, ramp(t, sc.dur - 2.2, 2.2), { width: '1920px', height: '1080px', background: '#c9d8ea' });
   }

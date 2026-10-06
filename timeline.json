@@ -1,10 +1,10 @@
 {
- "total": 422.626,
+ "total": 424.626,
  "scenes": [
   {
    "id": "intro",
    "start": 0.0,
-   "dur": 33.588,
+   "dur": 35.588,
    "sentences": [
     {
      "start": 2.0,
@@ -40,7 +40,7 @@
   },
   {
    "id": "site",
-   "start": 33.588,
+   "start": 35.588,
    "dur": 39.403,
    "sentences": [
     {
@@ -72,7 +72,7 @@
   },
   {
    "id": "problem",
-   "start": 72.991,
+   "start": 74.991,
    "dur": 25.953,
    "sentences": [
     {
@@ -104,7 +104,7 @@
   },
   {
    "id": "energy",
-   "start": 98.944,
+   "start": 100.944,
    "dur": 46.899,
    "sentences": [
     {
@@ -146,7 +146,7 @@
   },
   {
    "id": "photon",
-   "start": 145.843,
+   "start": 147.843,
    "dur": 45.266,
    "sentences": [
     {
@@ -193,7 +193,7 @@
   },
   {
    "id": "compute",
-   "start": 191.108,
+   "start": 193.108,
    "dur": 52.377,
    "sentences": [
     {
@@ -230,7 +230,7 @@
   },
   {
    "id": "tokens",
-   "start": 243.485,
+   "start": 245.485,
    "dur": 29.271,
    "sentences": [
     {
@@ -262,7 +262,7 @@
   },
   {
    "id": "measure",
-   "start": 272.756,
+   "start": 274.756,
    "dur": 37.048,
    "sentences": [
     {
@@ -294,7 +294,7 @@
   },
   {
    "id": "remote",
-   "start": 309.804,
+   "start": 311.804,
    "dur": 31.691,
    "sentences": [
     {
@@ -321,7 +321,7 @@
   },
   {
    "id": "schedule",
-   "start": 341.494,
+   "start": 343.494,
    "dur": 27.618,
    "sentences": [
     {
@@ -348,7 +348,7 @@
   },
   {
    "id": "checkpoint",
-   "start": 369.112,
+   "start": 371.112,
    "dur": 28.754,
    "sentences": [
     {
@@ -380,7 +380,7 @@
   },
   {
    "id": "outro",
-   "start": 397.867,
+   "start": 399.867,
    "dur": 24.759,
    "sentences": [
     {

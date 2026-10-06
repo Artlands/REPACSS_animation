@@ -1,12 +1,15 @@
-// The site at GLEAMM / Reese Technology Center, laid out from the aerial photo and site photos in REPACSS.pdf
-// and repacss.org/gallery (+z = south, +x = east, 1 unit = 1 m, building centred at the origin):
+// The site at GLEAMM / Reese Technology Center (33.61229 N, 102.04853 W, NW corner of the Reese airfield), laid out from
+// USDA NAIP aerial imagery and the site photos in REPACSS.pdf / repacss.org/gallery (+z = south, +x = east, 1 unit = 1 m,
+// building centred at the origin). The ground is the NAIP orthophoto itself (public domain, USGS The National Map):
+// 1.2 km square at 0.4 m/px over a 4 km square at 2 m/px, so roads, runway and fields sit where they really are.
 //  - tan ribbed-steel lab building, low gable roof (ridge N-S), north gable with roll-up door + sign,
 //    flat canopy on brown posts over the NW corner, lattice tower and guyed mast behind
 //  - six external cooling units on the west wall, square battery enclosure (550 kWh) to the south
 //  - white diesel genset, utility poles and transformer to the west
-//  - 350 kW field: 5 E-W rows of two-high racks (720 modules) south-west of the building, the two southern rows
-//    longer than the three northern ones, inverters at the (aligned) east row ends
-//  - wind turbines on the horizon: they feed the utility grid, not REPACSS directly
+//  - 350 kW field: 5 E-W rows of two-high racks west of the building; the two southern rows (94 m) are longer than the
+//    three northern ones (47 m). Rows at z 8.5 / 14 / 19.5 match the imagery; the two newest rows north of them are placed
+//    at the same pitch. Inverters at the east row ends
+//  - lattice met tower ~130 m SW; three research wind turbines 290-405 m south (they feed the utility grid, not REPACSS)
 import * as THREE from 'three';
 import { C, ui, ramp, win, rng, solarArray, std, emis, sky, flow, tube, cable, textSprite, textPlane, V, camPath, glowSprite } from '../lib.js';
 
@@ -16,6 +19,7 @@ function ribbedTex(base = '#c9c1a2', rib = 'rgba(0,0,0,.13)', hi = 'rgba(255,255
   for (let x = 0; x < 256; x += 16) { g.fillStyle = rib; g.fillRect(x, 0, 3, 64); g.fillStyle = hi; g.fillRect(x + 3, 0, 2, 64); }
   const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
 }
+const groundTex = await Promise.all(['reese_naip_4km.jpg', 'gleamm_naip_1200m.jpg'].map(f => new THREE.TextureLoader().loadAsync('assets/' + f).then(t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 16; return t; })));
 const mat = (o) => new THREE.MeshStandardMaterial({ roughness: .7, metalness: .25, ...o });
 
 /** box with ribbed walls; uv repeat sized to metres so ribs are ~0.3 m apart */
@@ -85,7 +89,7 @@ function latticeTower(h) {
 
 export function buildSite() {
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0xb7c4d6, 120, 420);
+  scene.fog = new THREE.Fog(0xb7c4d6, 300, 1400);
   scene.add(sky('#2f6fb8', '#86b4e0', '#e8dcc4'));
   const hemi = new THREE.HemisphereLight(0xcfe3ff, 0x8a7350, 1.1); scene.add(hemi);
   // sun high in the southern sky (+z is south)
@@ -94,16 +98,12 @@ export function buildSite() {
   scene.add(sunL);
   const sunDisc = glowSprite(0xfff3cf, 60, .9); sunDisc.position.set(-120, 220, 260); scene.add(sunDisc);
 
-  // ground: red-brown West Texas dirt with scrub, a caliche road east of the building
-  const c = document.createElement('canvas'); c.width = c.height = 2048; const g = c.getContext('2d'), r = rng(11);
-  g.fillStyle = '#ab8a64'; g.fillRect(0, 0, 2048, 2048);
-  for (let i = 0; i < 90000; i++) { const v = 115 + r() * 70 | 0, gr = r() < .25; g.fillStyle = gr ? `rgba(${v * .7 | 0},${v * .75 | 0},${v * .5 | 0},.35)` : `rgba(${v},${v * .82 | 0},${v * .6 | 0},.3)`; g.fillRect(r() * 2048, r() * 2048, 2 + r() * 5, 2 + r() * 5); }
-  const P = (m) => (m + 400) / 800 * 2048;
-  g.fillStyle = '#a7a196'; g.fillRect(P(13), 0, P(21) - P(13), 2048);
-  g.fillStyle = '#9e978b'; g.fillRect(P(-30), P(-16), P(13) - P(-30), P(12) - P(-16));   // gravel yard
-  const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(800, 800), new THREE.MeshStandardMaterial({ map: tex, roughness: 1 }));
-  ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+  // ground: NAIP orthophotos centred on the building (north up), the fine one over the coarse one; darkened because the
+  // photo already carries its own sunlight
+  for (const [map, size, y] of [[groundTex[0], 4000, -.06], [groundTex[1], 1200, 0]]) {
+    const gm = new THREE.Mesh(new THREE.PlaneGeometry(size, size), new THREE.MeshStandardMaterial({ map, color: 0xc0c0c0, roughness: 1, metalness: 0 }));
+    gm.rotation.x = -Math.PI / 2; gm.position.y = y; gm.receiveShadow = true; scene.add(gm);
+  }
 
   // building
   const dc = gleammBuilding(); scene.add(dc);
@@ -111,20 +111,18 @@ export function buildSite() {
   // six external cooling units on the west side, 2 × 3 along the wall
   const conds = [];
   for (let i = 0; i < 6; i++) { const cd = condenser(); cd.position.set(-7.4 - (i % 2) * 1.6, 0, 1.2 + (i >> 1) * 1.6); scene.add(cd); conds.push(cd); }
-  // lattice tower and guyed mast south of the building
-  const tw = latticeTower(30); tw.position.set(11, 0, 15); scene.add(tw);
-  const mast = new THREE.Mesh(new THREE.CylinderGeometry(.12, .16, 46, 6), std(0xb0b4ba, { metalness: .8 })); mast.position.set(-2, 23, 21); scene.add(mast);
-  for (const [dx, dz] of [[14, 6], [-12, 8], [2, -14]]) scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([V(-2, 40, 21), V(-2 + dx, 0, 21 + dz)]), new THREE.LineBasicMaterial({ color: 0x8a8f96, transparent: true, opacity: .5 })));
+  // lattice met tower south-west of the array (position from the imagery)
+  const tw = latticeTower(60); tw.position.set(-128, 0, 77); scene.add(tw);
 
-  // PV field: 3 rows × 60 + 2 rows × 90 columns, 2-high = 720 modules (~350 kW), rows run E-W south-west of the building;
-  // the two southern rows are longer, extending further west, east ends aligned at x ≈ -17.5
+  // PV field: [columns, row centre z, east-end x] per row, 2-high racks; the two northern rows stop short of the genset
+  const ROWS = [[45, -2.5, -18.8], [45, 3, -18.8], [45, 8.5, -16.8], [90, 14, -16.8], [90, 19.5, -16.8]];
   const pv = new THREE.Group(); scene.add(pv);
-  for (const [rows, cols, z] of [[3, 60, 9.5], [2, 90, 9.5 + 3 * 6.4]]) { const a = solarArray(rows, cols, .55, { high: 2, pitch: 6.4 }); a.position.set(-17.45 - (cols - 1) * 1.05, 0, z); pv.add(a); }
+  for (const [cols, z, ex] of ROWS) { const a = solarArray(1, cols, .55, { high: 2 }); a.position.set(ex - (cols - 1) * 1.05, 0, z); pv.add(a); }
   pv.traverse(o => { o.castShadow = true; o.receiveShadow = true; if (o.isInstancedMesh && o.material.map) { o.material = o.material.clone(); o.material.roughness = .45; o.material.envMapIntensity = .4; } });
-  for (let i = 0; i < 5; i++) {   // string inverters on a post frame just east of each row end (clear of the modules)
-    const z0 = 9.5 + i * 6.4, frame = new THREE.Mesh(new THREE.BoxGeometry(.08, .08, 2.9), std(0x9aa0a8, { metalness: .8 })); frame.position.set(-15.55, 1.55, z0); scene.add(frame);
-    for (const dz of [-1.35, 1.35]) { const p = new THREE.Mesh(new THREE.BoxGeometry(.06, 1.5, .06), std(0x9aa0a8, { metalness: .8 })); p.position.set(-15.55, .75, z0 + dz); scene.add(p); }
-    for (let k = 0; k < 3; k++) { const inv = new THREE.Mesh(new THREE.BoxGeometry(.3, .8, .7), std(0xe6e8ea)); inv.position.set(-15.35, 1.1, z0 - .9 + k * .9); inv.castShadow = true; scene.add(inv); }
+  for (const [, z0, ex] of ROWS) {   // string inverters on a post frame just east of each row end (clear of the modules)
+    const ix = ex + 1.25, frame = new THREE.Mesh(new THREE.BoxGeometry(.08, .08, 2.9), std(0x9aa0a8, { metalness: .8 })); frame.position.set(ix, 1.55, z0); scene.add(frame);
+    for (const dz of [-1.35, 1.35]) { const p = new THREE.Mesh(new THREE.BoxGeometry(.06, 1.5, .06), std(0x9aa0a8, { metalness: .8 })); p.position.set(ix, .75, z0 + dz); scene.add(p); }
+    for (let k = 0; k < 3; k++) { const inv = new THREE.Mesh(new THREE.BoxGeometry(.3, .8, .7), std(0xe6e8ea)); inv.position.set(ix + .2, 1.1, z0 - .9 + k * .9); inv.castShadow = true; scene.add(inv); }
   }
 
   // diesel genset (white CAT enclosure on a black base tank) west of the building
@@ -143,15 +141,16 @@ export function buildSite() {
   const battLed = new THREE.Mesh(new THREE.BoxGeometry(1.8, .12, .04), emis(0x7dffa5, 2)); battLed.position.set(0, 2.4, 1.63); batt.add(battLed);
   batt.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
 
-  // two wind turbines on the horizon
+  // three research wind turbines south of the site (positions from the imagery; ~32 m hub, 27 m rotor), rotors facing south
   const turbines = [];
-  for (const [x, z, ph] of [[-190, -240, 0], [-120, -270, 1.3]]) {
+  for (const [x, z, ph] of [[-15, 288, 0], [-15, 400, 1.3], [-95, 405, 2.4]]) {
     const w = new THREE.Group(); w.position.set(x, 0, z); scene.add(w);
     const white = std(0xf2f4f6, { metalness: .1, roughness: .5 });
-    const tower = new THREE.Mesh(new THREE.CylinderGeometry(1, 2, 50, 16), white); tower.position.y = 25; w.add(tower);
-    const nac = new THREE.Mesh(new THREE.BoxGeometry(2.4, 2.4, 6), white); nac.position.set(0, 51, 0); w.add(nac);
-    const rotor = new THREE.Group(); rotor.position.set(0, 51, 3.3); w.add(rotor);
-    for (let k = 0; k < 3; k++) { const b = new THREE.Mesh(new THREE.BoxGeometry(1.3, 22, .4), white); b.geometry.translate(0, 11, 0); b.rotation.z = k * Math.PI * 2 / 3; b.position.z = k * .06; rotor.add(b); }
+    const tower = new THREE.Mesh(new THREE.CylinderGeometry(.9, 1.5, 32, 16), white); tower.position.y = 16; w.add(tower);
+    const nac = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 4.5), white); nac.position.set(0, 32.5, 0); w.add(nac);
+    const rotor = new THREE.Group(); rotor.position.set(0, 32.5, 2.6); w.add(rotor);
+    for (let k = 0; k < 3; k++) { const b = new THREE.Mesh(new THREE.BoxGeometry(1, 13.5, .3), white); b.geometry.translate(0, 6.75, 0); b.rotation.z = k * Math.PI * 2 / 3; b.position.z = k * .05; rotor.add(b); }
+    w.traverse(o => { if (o.isMesh) o.castShadow = true; });
     rotor.ph = ph; turbines.push(rotor);
   }
 
@@ -172,7 +171,7 @@ export function buildSite() {
 
   // energy flows into the building's west wall: PV inverters, battery, grid, generator
   const flows = [
-    [cable([-15.2, .3, 9.5], [-6.4, .3, 4.5], 1.2), C.sun, 1],
+    [cable([-15.3, .3, 8.5], [-6.4, .3, 4.5], 1.2), C.sun, 1],
     [cable([-21, .3, -6.5], [-6.4, .3, -2.5], 1.4), 0xe4e8f0, .35],
     [cable([-7.9, .3, -7.5], [-6.4, .3, -3.5], .8), 0xffffff, .8],
     [cable([1.5, .3, 7.8], [1.5, .3, 5.7], .8), 0x7dffa5, .6],
@@ -203,13 +202,14 @@ export default function site(sc, shared) {
     [s(2) + 3, V(-10, 5, 48), V(-60, 2, 18)],
     [s(3) - .3, V(-16, 16, 34), V(-8, 1, -2)],
     [s(3) + 4, V(-18, 15, 32), V(-10, 1, -4)],
-    [s(4) - .3, V(2, 6, -22), V(-90, 26, -200)],
-    [sc.dur, V(5, 6, -16), V(-100, 30, -220)],
+    [s(4) - .35, V(-18, 15, 32), V(-10, 1, -4)],     // hold, then cut to the turbines to the south
+    [s(4) - .3, V(-40, 30, -60), V(-45, 0, 300)],      // from north of the array: rows + building in front, turbines beyond
+    [sc.dur, V(-38, 32, -48), V(-47, 0, 310)],
   ];
   function update(t) {
     camPath(camera, t, keys); S.animate(t, ramp(t, 2, 3));
     S.sunL.color.setHex(0xfff1d6); S.hemi.color.setHex(0xcfe3ff); S.sunL.intensity = 2.6; S.hemi.intensity = 1.1;
-    const y = camera.position.y; S.scene.fog.near = 120 + y; S.scene.fog.far = 420 + 1.5 * y;
+    const y = camera.position.y; S.scene.fog.near = 300 + y; S.scene.fog.far = 1400 + 1.5 * y;
     ui.el('s-haze', '', '', 0, 0, 1 - ramp(t, 0, 2.2), { width: '1920px', height: '1080px', background: '#c9d8ea' });
     ui.el('s-scrim', '', '', 0, 0, win(t, .5, sc.dur, .8), { width: '1920px', height: '300px', background: 'linear-gradient(rgba(2,6,16,.75),rgba(2,6,16,0))', zIndex: -1 });
     ui.el('s-k', 'kicker', 'The site', 90, 70, win(t, .5, sc.dur, .8));
@@ -217,12 +217,12 @@ export default function site(sc, shared) {
     ui.el('s-l', 'sub', 'Global Laboratory for Energy Asset Management and Manufacturing · 10 miles west of Texas Tech, Lubbock', 92, 172, win(t, 1.2, sc.dur, .8), { color: '#dfe7f5', fontSize: '24px' });
     ui.label('s-dc', 'GLEAMM building · REPACSS<small>HPC + AI machine room inside</small>', V(1, 5.4, 0), camera, win(t, 1.6, s(2) - .4, .6), '#ff8a94');
     ui.el('s-lab', 'card', '<div class="cap" style="margin:0">GLEAMM microgrid · since 2015</div><div style="font-size:23px;margin-top:8px;line-height:1.55">building + energy infrastructure<br>multiple energy sources &amp; storage<br>dense instrumentation &amp; control</div>', 90, 780, win(t, s(1) + .6, s(2) - .2, .5));
-    ui.label('s-pv', 'Solar array<small>350 kW</small>', V(-54, 4, 22), camera, win(t, s(2) + .2, s(3) - .2, .6), '#ffc46b');
+    ui.label('s-pv', 'Solar array<small>350 kW</small>', V(-50, 4, 9), camera, win(t, s(2) + .2, s(3) - .2, .6), '#ffc46b');
     const op3 = win(t, s(3) + .2, s(4) - .2, .5);
     ui.label('s-bt', 'Battery storage<small>550 kWh</small>', V(1.5, 3.4, 9.5), camera, op3, '#7dffa5');
     ui.label('s-gn', 'Diesel generator<small>500 kW · automatic transfer switch</small>', V(-13, 4, -2.5), camera, ramp(t, s(3) + 1.6, .5) * op3, '#ffb07a');
     ui.label('s-gr', 'Utility grid<small>commercial power</small>', V(-24, 3.4, -8), camera, ramp(t, s(3) + 3.4, .5) * op3, '#e4e8f0');
-    ui.label('s-wd', 'Wind turbines<small>feed the utility grid · low-cost power</small>', V(-155, 78, -255), camera, win(t, s(4) + .6, sc.dur, .6), '#cfe8ff');
+    ui.label('s-wd', 'Wind turbines<small>feed the utility grid · low-cost power</small>', V(-40, 52, 360), camera, win(t, s(4) + .6, sc.dur, .6), '#cfe8ff');
   }
   return { scene: S.scene, camera, update, noFadeIn: true, exposure: .9, bloom: { strength: .35, radius: .4, threshold: .92 } };
 }

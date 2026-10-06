@@ -10,7 +10,7 @@ export default function outro(sc, shared) {
   const day = { sun: new THREE.Color(0xfff1d6), hemi: new THREE.Color(0xcfe3ff) }, gold = { sun: new THREE.Color(0xffb36a), hemi: new THREE.Color(0xffcf9e) };
 
   function update(t) {
-    camPath(camera, t, keys); S.animate(t + 40); S.scene.fog.near = 120; S.scene.fog.far = 420;
+    camPath(camera, t, keys); S.animate(t + 40); S.scene.fog.near = 300; S.scene.fog.far = 1400;
     S.sunL.color.copy(gold.sun); S.hemi.color.copy(gold.hemi); S.sunL.intensity = 2.2; S.hemi.intensity = .8;
     const card = (id, html, x, y, a, b) => ui.el(id, 'card', html, x, y, win(t, a, b, .5));
     ui.el('o-scrim', '', '', 0, 0, win(t, .4, s(2), .6), { width: '1920px', height: '300px', background: 'linear-gradient(rgba(2,6,16,.75),rgba(2,6,16,0))', zIndex: -1 });

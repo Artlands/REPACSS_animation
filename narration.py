@@ -22,7 +22,7 @@ TAKES = 14          # max seeds tried per sentence
 
 # (scene id, lead-in seconds, tail seconds, [sentences])
 SCRIPT = [
-    ("intro", 2.0, 3.0, [
+    ("intro", 2.0, 5.0, [
         "Every answer an AI model gives you is built one token at a time.",
         "And every token begins, somewhere, as energy.",
         "Almost all of the energy on Earth traces back to a single source: the sun.",
