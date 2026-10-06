@@ -1,5 +1,6 @@
 // The GLEAMM microgrid as REPACSS sees it: five sources on one AC bus -> UPS -> cluster.
 // Each sentence switches the flows: battery smoothing, grid outage + generator, grid for priority work, wind.
+// Wind does not feed REPACSS directly: it flows into the utility grid and arrives as low-priced grid power.
 import * as THREE from 'three';
 import { C, ui, ramp, win, lerp, rng, solarArray, rack, std, emis, flow, tube, cable, grid, textSprite, V, camPath, glowSprite } from '../lib.js';
 
@@ -49,7 +50,7 @@ export default function energy(sc) {
   const nac = new THREE.Mesh(new THREE.BoxGeometry(.5, .5, 1.1), white); nac.position.y = 5.1; wind.add(nac);
   const rotor = new THREE.Group(); rotor.position.set(0, 5.1, .65); wind.add(rotor);
   for (let k = 0; k < 3; k++) { const b = new THREE.Mesh(new THREE.BoxGeometry(.24, 2.4, .06), white); b.geometry.translate(0, 1.2, 0); b.rotation.z = k * 2.094; b.position.z = k * .012; rotor.add(b); }
-  label('Wind', 'interconnected turbines', '#cfe8ff', SX.wind + 3.2, 4.4, SZ);
+  label('Wind', 'via the utility grid', '#cfe8ff', SX.wind + 3.2, 4.4, SZ);
   // utility grid
   const gridG = new THREE.Group(); gridG.position.set(SX.grid, 0, SZ); scene.add(gridG); groups.grid = gridG;
   const wood = std(0x7a6248, { metalness: 0, roughness: .9 });
@@ -67,7 +68,7 @@ export default function energy(sc) {
   const batt = new THREE.Group(); batt.position.set(SX.batt, 0, SZ); scene.add(batt); groups.batt = batt;
   const cb = new THREE.Mesh(new THREE.BoxGeometry(4.6, 2, 1.8), std(0xe9e3d2, { roughness: .7 })); cb.position.set(0, 1, -.6); batt.add(cb);
   const socBars = Array.from({ length: 8 }, (_, i) => { const m = new THREE.Mesh(new THREE.BoxGeometry(.4, .7, .05), emis(0x7dffa5, 1.5)); m.position.set(-1.75 + i * .5, 1.1, .32); batt.add(m); return m; });
-  label('Battery', '760 kWh', '#7dffa5', SX.batt, 3.8, SZ);
+  label('Battery', '550 kWh', '#7dffa5', SX.batt, 3.8, SZ);
 
   // bus, UPS, cluster
   const bus = new THREE.Mesh(new THREE.BoxGeometry(40, .16, .16), emis(0xffe2a0, .8)); bus.position.set(0, .35, -1); scene.add(bus);
@@ -83,7 +84,7 @@ export default function energy(sc) {
   const mk = (cv, col, seed) => { const f = flow(cv, 50, col, .6, seed), tb = tube(cv, col, .06, .2); scene.add(f, tb); f.tb = tb; return f; };
   const F = {
     solar: mk(cable([SX.solar, .3, SZ + 1.5], [SX.solar, .3, -1.1], .4), C.sun, 1),
-    wind: mk(cable([SX.wind, .3, SZ], [SX.wind, .3, -1.1], .4), 0xcfe8ff, 2),
+    wind: mk(cable([SX.wind + .4, .3, SZ - 1], [SX.grid - .3, .3, SZ - 1], .6), 0xcfe8ff, 2),   // wind → utility grid, not the bus
     grid: mk(cable([SX.grid, .3, SZ + 1.8], [SX.grid, .3, -1.1], .4), 0xe4e8f0, 3),
     gen: mk(cable([SX.gen, .3, SZ + .8], [SX.gen, .3, -1.1], .4), 0xffb07a, 4),
     batt: mk(cable([SX.batt, .3, SZ + .4], [SX.batt, .3, -1.1], .4), 0x7dffa5, 5),
@@ -124,7 +125,7 @@ export default function energy(sc) {
     const discharge = cloudIn;
     const ride = win(t, s(3) + .4, s(3) + 3.0, .3);          // UPS bridge
     const genOn = ramp(t, s(3) + 2.6, .8) * (1 - ramp(t, s(4) + .1, .6));
-    const gridOn = (1 - outage) * (t < s(3) ? .25 : t < s(5) ? .25 + .75 * nightT : .25 + .3 * ramp(t, s(6), 1));
+    const gridOn = (1 - outage) * Math.max(windP, t < s(3) ? .25 : t < s(5) ? .25 + .75 * nightT : .25 + .3 * ramp(t, s(6), 1));
     const all = ramp(t, s(6) + .3, 1);
 
     F.solar.update(t, .3, sunP); F.solar.tb.material.opacity = .08 + .25 * sunP;
@@ -147,13 +148,13 @@ export default function energy(sc) {
 
     // ---- overlay ----
     ui.header('en-h', 'The microgrid', 'More than sunlight', win(t, .4, sc.dur, .6), '#7dffa5');
-    const mode = t < s(1) ? '' : t < s(1) + 2.4 ? 'Sun strong → battery charging' : t < s(3) ? 'Cloud passing → battery discharging' : t < s(3) + 2.6 ? 'GRID OUTAGE → UPS bridging' : t < s(4) ? 'Generator carrying the load' : t < s(5) ? 'After sunset → grid powers priority jobs' : t < s(6) ? 'Wind available → added to the mix' : 'Sources chosen by cost & availability';
+    const mode = t < s(1) ? '' : t < s(1) + 2.4 ? 'Sun strong → battery charging' : t < s(3) ? 'Cloud passing → battery discharging' : t < s(3) + 2.6 ? 'GRID OUTAGE → UPS bridging' : t < s(4) ? 'Generator carrying the load' : t < s(5) ? 'After sunset → grid powers priority jobs' : t < s(6) ? 'Wind blowing → low-cost power via the grid' : 'Sources chosen by cost & availability';
     const modeCol = t < s(3) ? '#7dffa5' : t < s(4) ? '#ffb07a' : t < s(5) ? '#e4e8f0' : t < s(6) ? '#cfe8ff' : '#ffe2a0';
     ui.el('en-m', 'chip', `<span style="color:${modeCol}">●</span>&nbsp; ${mode}`, 90, 196, mode ? win(t, s(1), sc.dur, .4) : 0, { fontSize: '24px' });
     ui.el('en-c', 'card', `<div class="cap" style="margin:0 0 8px">Battery smoothing · one cloudy day</div>${chartSVG(ramp(t, s(2) + .2, 6))}`, 1290, 640, win(t, s(2), s(3) - .2, .5));
     ui.el('en-u', 'card', `<div class="cap" style="margin:0">Ride-through</div><div style="font-size:23px;margin-top:8px;line-height:1.55">grid fails → <b style="color:#7dffa5">UPS</b> holds the load<br>automatic transfer switch → <b style="color:#ffb07a">generator</b><br>500 kW · jobs keep running</div>`, 90, 800, win(t, s(3) + .6, s(4) - .2, .5));
     ui.el('en-g', 'card', `<div class="cap" style="margin:0">Commercial grid</div><div style="font-size:23px;margin-top:8px;line-height:1.55">high-priority workloads<br>keep running, day or night</div>`, 90, 820, win(t, s(4) + .6, s(5) - .2, .5));
-    const rows = [['Solar', '350 kW', '#ffc46b', 'lowest cost · daytime'], ['Battery', '760 kWh', '#7dffa5', 'smooths short swings'], ['Wind', 'when available', '#cfe8ff', 'variable'], ['Utility grid', 'commercial', '#e4e8f0', 'priority work · priced'], ['Diesel generator', '500 kW', '#ffb07a', 'backup · outages']];
+    const rows = [['Solar', '350 kW', '#ffc46b', 'lowest cost · daytime'], ['Battery', '550 kWh', '#7dffa5', 'smooths short swings'], ['Wind', 'via utility grid', '#cfe8ff', 'low price when blowing'], ['Utility grid', 'commercial', '#e4e8f0', 'priority work · priced'], ['Diesel generator', '500 kW', '#ffb07a', 'backup · outages']];
     ui.el('en-p', 'card', `<div class="cap" style="margin:0 0 8px">Selected by cost &amp; availability</div>` + rows.map(([n, v, c, d]) => `<div style="font-size:21px;line-height:1.6"><b style="color:${c}">${n}</b> <span style="color:var(--dim)">· ${v} · ${d}</span></div>`).join(''), 1300, 640, win(t, s(6) + .4, sc.dur, .5));
   }
   return { scene, camera, update, env: .25, bloom: { strength: .8, radius: .45, threshold: .75 } };

@@ -34,8 +34,8 @@ SCRIPT = [
         "This is GLEAMM, the Global Laboratory for Energy Asset Management and Manufacturing, at the Reese Technology Center.",
         "Built in 2015 as a microgrid laboratory, it gives REPACSS its building, its energy infrastructure, and dense instrumentation and control.",
         "Its main renewable source is a 350 kilowatt solar array, right beside the machine room.",
-        "Next to it sit a 760 kilowatt-hour battery bank, a 500 kilowatt diesel generator, and a tie to the commercial power grid.",
-        "And on the horizon, wind turbines can add their share when the West Texas wind is blowing.",
+        "Next to it sit a 550 kilowatt-hour battery bank, a 500 kilowatt diesel generator, and a tie to the commercial power grid.",
+        "On the horizon, wind turbines feed the utility grid, so when the West Texas wind is blowing, grid power gets cheaper.",
     ]),
     ("problem", 0.8, 1.3, [
         "Supercomputers and AI clusters are hungry machines, built to draw steady power around the clock.",
@@ -46,11 +46,11 @@ SCRIPT = [
     ]),
     ("energy", 0.8, 1.5, [
         "And it does not have to rely on sunlight alone.",
-        "The 760 kilowatt-hour battery charges when the sun is strong, and discharges when a cloud passes.",
+        "The 550 kilowatt-hour battery charges when the sun is strong, and discharges when a cloud passes.",
         "It levels out short swings in available power, so jobs keep running, instead of stopping for a checkpoint and restore cycle every time a cloud drifts by.",
         "If the utility grid goes down, the UPS carries the cluster through the first seconds, while the 500 kilowatt diesel generator starts and takes over the load.",
         "The connection to the commercial grid also lets high priority workloads keep running whenever needed, day or night.",
-        "And when the wind is blowing, wind power can join the mix.",
+        "And when the wind is blowing, low cost wind power reaches the cluster through the utility grid.",
         "Every source can be selected and prioritized by cost and availability, just as a commercial data center would have to.",
     ]),
     ("photon", 0.8, 1.3, [

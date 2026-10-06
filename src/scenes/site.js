@@ -2,10 +2,11 @@
 // and repacss.org/gallery (+z = south, +x = east, 1 unit = 1 m, building centred at the origin):
 //  - tan ribbed-steel lab building, low gable roof (ridge N-S), north gable with roll-up door + sign,
 //    flat canopy on brown posts over the NW corner, lattice tower and guyed mast behind
-//  - HVAC condensers on the west wall, red-roof shed and two small PV arrays to the south
-//  - white diesel genset, blue battery cabinets + battery container, utility poles and transformer to the west
-//  - 350 kW field: 5 long E-W rows of two-high racks (720 modules) south-west of the building, inverters at row ends
-//  - wind turbines on the horizon
+//  - six external cooling units on the west wall, square battery enclosure (550 kWh) to the south
+//  - white diesel genset, utility poles and transformer to the west
+//  - 350 kW field: 5 E-W rows of two-high racks (720 modules) south-west of the building, the two southern rows
+//    longer than the three northern ones, inverters at the (aligned) east row ends
+//  - wind turbines on the horizon: they feed the utility grid, not REPACSS directly
 import * as THREE from 'three';
 import { C, ui, ramp, win, rng, solarArray, std, emis, sky, flow, tube, cable, textSprite, textPlane, V, camPath, glowSprite } from '../lib.js';
 
@@ -107,20 +108,19 @@ export function buildSite() {
   // building
   const dc = gleammBuilding(); scene.add(dc);
   const glow = dc.glow;
-  // condensers along the west wall, red-roof shed + two small PV arrays to the south
+  // six external cooling units on the west side, 2 × 3 along the wall
   const conds = [];
-  for (let i = 0; i < 4; i++) { const cd = condenser(); cd.position.set(-7.4, 0, -.5 + i * 1.6); scene.add(cd); conds.push(cd); }
-  const shed = new THREE.Group(); shed.position.set(3.1, 0, 8.1); scene.add(shed);
-  const sb = new THREE.Mesh(new THREE.BoxGeometry(6, 2.6, 3.3), mat({ color: 0xd8d2c0 })); sb.position.y = 1.3; shed.add(sb);
-  const sr = new THREE.Mesh(new THREE.BoxGeometry(6.3, .15, 3.6), mat({ color: 0xb2483c })); sr.position.y = 2.68; shed.add(sr);
-  for (const z of [15.5, 22.7]) { const sm = solarArray(2, 5, .55, { pitch: 1.9 }); sm.position.set(.2, 0, z - 1); scene.add(sm); }
+  for (let i = 0; i < 6; i++) { const cd = condenser(); cd.position.set(-7.4 - (i % 2) * 1.6, 0, 1.2 + (i >> 1) * 1.6); scene.add(cd); conds.push(cd); }
   // lattice tower and guyed mast south of the building
   const tw = latticeTower(30); tw.position.set(11, 0, 15); scene.add(tw);
   const mast = new THREE.Mesh(new THREE.CylinderGeometry(.12, .16, 46, 6), std(0xb0b4ba, { metalness: .8 })); mast.position.set(-2, 23, 21); scene.add(mast);
   for (const [dx, dz] of [[14, 6], [-12, 8], [2, -14]]) scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([V(-2, 40, 21), V(-2 + dx, 0, 21 + dz)]), new THREE.LineBasicMaterial({ color: 0x8a8f96, transparent: true, opacity: .5 })));
 
-  // PV field: 5 rows × 72 columns × 2-high = 720 modules (~350 kW), rows run E-W south-west of the building
-  const pv = solarArray(5, 72, .55, { high: 2, pitch: 6.4 }); pv.position.set(-92, 0, 9.5); pv.traverse(o => { o.castShadow = true; o.receiveShadow = true; if (o.isInstancedMesh && o.material.map) { o.material = o.material.clone(); o.material.roughness = .45; o.material.envMapIntensity = .4; } }); scene.add(pv);
+  // PV field: 3 rows × 60 + 2 rows × 90 columns, 2-high = 720 modules (~350 kW), rows run E-W south-west of the building;
+  // the two southern rows are longer, extending further west, east ends aligned at x ≈ -17.5
+  const pv = new THREE.Group(); scene.add(pv);
+  for (const [rows, cols, z] of [[3, 60, 9.5], [2, 90, 9.5 + 3 * 6.4]]) { const a = solarArray(rows, cols, .55, { high: 2, pitch: 6.4 }); a.position.set(-17.45 - (cols - 1) * 1.05, 0, z); pv.add(a); }
+  pv.traverse(o => { o.castShadow = true; o.receiveShadow = true; if (o.isInstancedMesh && o.material.map) { o.material = o.material.clone(); o.material.roughness = .45; o.material.envMapIntensity = .4; } });
   for (let i = 0; i < 5; i++) {   // string inverters on a post frame just east of each row end (clear of the modules)
     const z0 = 9.5 + i * 6.4, frame = new THREE.Mesh(new THREE.BoxGeometry(.08, .08, 2.9), std(0x9aa0a8, { metalness: .8 })); frame.position.set(-15.55, 1.55, z0); scene.add(frame);
     for (const dz of [-1.35, 1.35]) { const p = new THREE.Mesh(new THREE.BoxGeometry(.06, 1.5, .06), std(0x9aa0a8, { metalness: .8 })); p.position.set(-15.55, .75, z0 + dz); scene.add(p); }
@@ -135,14 +135,12 @@ export function buildSite() {
   for (let i = 0; i < 4; i++) { const dr = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.9, .04), mat({ color: 0xdfdbcf })); dr.position.set(-2 + i * 1.25, 1.75, 1.17); gen.add(dr); }
   gen.traverse(o => { if (o.isMesh) o.castShadow = true; });
 
-  // battery storage: blue cabinets (2 × 130 kWh) + a 500 kWh container, north-west of the genset
-  const batt = new THREE.Group(); batt.position.set(-15, 0, -10); scene.add(batt);
-  const cabs = [];
-  for (let i = 0; i < 2; i++) { const cb = new THREE.Mesh(new THREE.BoxGeometry(1.3, 1.4, 1.1), mat({ color: 0x2b3fa6, metalness: .4 })); cb.position.set(4 + i * 1.6, .7, 0); batt.add(cb); cabs.push(cb);
-    const fan = new THREE.Mesh(new THREE.CircleGeometry(.4, 24), mat({ color: 0x1a1d24 })); fan.position.set(4 + i * 1.6, .75, .56); batt.add(fan); }
-  const cont = new THREE.Mesh(new THREE.BoxGeometry(6, 2.6, 2.4), mat({ color: 0xe5dcc5, roughness: .7 })); cont.position.set(-2, 1.3, 0); batt.add(cont);
-  for (let i = 0; i < 4; i++) { const bar = new THREE.Mesh(new THREE.CylinderGeometry(.03, .03, 2.3, 6), std(0xa9adb2, { metalness: .9 })); bar.position.set(-4.6 + i * .5, 1.3, 1.23); batt.add(bar); }
-  const battLed = new THREE.Mesh(new THREE.BoxGeometry(1.8, .12, .04), emis(0x7dffa5, 2)); battLed.position.set(-.3, 2.2, 1.22); batt.add(battLed);
+  // battery storage: one square 550 kWh enclosure south of the building
+  const batt = new THREE.Group(); batt.position.set(1.5, 0, 9.5); scene.add(batt);
+  const bBox = new THREE.Mesh(new THREE.BoxGeometry(3.2, 2.6, 3.2), mat({ color: 0xe5dcc5, roughness: .7 })); bBox.position.y = 1.3; batt.add(bBox);
+  const bPad = new THREE.Mesh(new THREE.BoxGeometry(3.8, .15, 3.8), mat({ color: 0xbdb8ae, roughness: .95, metalness: 0 })); bPad.position.y = .07; batt.add(bPad);
+  for (const sx of [-1, 1]) { const d = new THREE.Mesh(new THREE.BoxGeometry(1.4, 2.1, .04), mat({ color: 0xdcd3bb })); d.position.set(sx * .75, 1.25, 1.62); batt.add(d); }
+  const battLed = new THREE.Mesh(new THREE.BoxGeometry(1.8, .12, .04), emis(0x7dffa5, 2)); battLed.position.set(0, 2.4, 1.63); batt.add(battLed);
   batt.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
 
   // two wind turbines on the horizon
@@ -177,7 +175,7 @@ export function buildSite() {
     [cable([-15.2, .3, 9.5], [-6.4, .3, 4.5], 1.2), C.sun, 1],
     [cable([-21, .3, -6.5], [-6.4, .3, -2.5], 1.4), 0xe4e8f0, .35],
     [cable([-7.9, .3, -7.5], [-6.4, .3, -3.5], .8), 0xffffff, .8],
-    [cable([-12, .3, -10], [-6.4, .3, -4.5], 1.6), 0x7dffa5, .6],
+    [cable([1.5, .3, 7.8], [1.5, .3, 5.7], .8), 0x7dffa5, .6],
     [cable([-9.9, .3, -2.5], [-6.4, .3, .5], .9), 0xffb07a, .25],
   ].map(([cv, col, dens], i) => { const f = flow(cv, 60, col, .7, 20 + i); const tb = tube(cv, col, .09, .35); scene.add(f, tb); f.tube = tb; f.dens = dens; return f; });
 
@@ -203,8 +201,8 @@ export default function site(sc, shared) {
     [s(1) + 4.5, V(4, 2.6, -21), V(-4, 3.4, 3)],
     [s(2) - .3, V(-26, 30, 78), V(-50, 0, 20)],
     [s(2) + 3, V(-10, 5, 48), V(-60, 2, 18)],
-    [s(3) - .3, V(4, 13, -32), V(-14, 1, -5)],
-    [s(3) + 4, V(-2, 12, -30), V(-16, 1, -4)],
+    [s(3) - .3, V(-16, 16, 34), V(-8, 1, -2)],
+    [s(3) + 4, V(-18, 15, 32), V(-10, 1, -4)],
     [s(4) - .3, V(2, 6, -22), V(-90, 26, -200)],
     [sc.dur, V(5, 6, -16), V(-100, 30, -220)],
   ];
@@ -221,10 +219,10 @@ export default function site(sc, shared) {
     ui.el('s-lab', 'card', '<div class="cap" style="margin:0">GLEAMM microgrid · since 2015</div><div style="font-size:23px;margin-top:8px;line-height:1.55">building + energy infrastructure<br>multiple energy sources &amp; storage<br>dense instrumentation &amp; control</div>', 90, 780, win(t, s(1) + .6, s(2) - .2, .5));
     ui.label('s-pv', 'Solar array<small>350 kW</small>', V(-54, 4, 22), camera, win(t, s(2) + .2, s(3) - .2, .6), '#ffc46b');
     const op3 = win(t, s(3) + .2, s(4) - .2, .5);
-    ui.label('s-bt', 'Battery storage<small>760 kWh</small>', V(-15, 4, -10), camera, op3, '#7dffa5');
+    ui.label('s-bt', 'Battery storage<small>550 kWh</small>', V(1.5, 3.4, 9.5), camera, op3, '#7dffa5');
     ui.label('s-gn', 'Diesel generator<small>500 kW · automatic transfer switch</small>', V(-13, 4, -2.5), camera, ramp(t, s(3) + 1.6, .5) * op3, '#ffb07a');
-    ui.label('s-gr', 'Utility grid<small>commercial power</small>', V(-27, 12, -12), camera, ramp(t, s(3) + 3.4, .5) * op3, '#e4e8f0');
-    ui.label('s-wd', 'Wind turbines<small>interconnected · when the wind blows</small>', V(-155, 78, -255), camera, win(t, s(4) + .6, sc.dur, .6), '#cfe8ff');
+    ui.label('s-gr', 'Utility grid<small>commercial power</small>', V(-24, 3.4, -8), camera, ramp(t, s(3) + 3.4, .5) * op3, '#e4e8f0');
+    ui.label('s-wd', 'Wind turbines<small>feed the utility grid · low-cost power</small>', V(-155, 78, -255), camera, win(t, s(4) + .6, sc.dur, .6), '#cfe8ff');
   }
   return { scene: S.scene, camera, update, noFadeIn: true, exposure: .9, bloom: { strength: .35, radius: .4, threshold: .92 } };
 }

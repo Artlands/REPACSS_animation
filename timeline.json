@@ -1,5 +1,5 @@
 {
- "total": 420.229,
+ "total": 422.626,
  "scenes": [
   {
    "id": "intro",
@@ -41,7 +41,7 @@
   {
    "id": "site",
    "start": 33.588,
-   "dur": 38.448,
+   "dur": 39.403,
    "sentences": [
     {
      "start": 0.8,
@@ -60,19 +60,19 @@
     },
     {
      "start": 23.179,
-     "end": 31.464,
-     "text": "Next to it sit a 760 kilowatt-hour battery bank, a 500 kilowatt diesel generator, and a tie to the commercial power grid."
+     "end": 30.946,
+     "text": "Next to it sit a 550 kilowatt-hour battery bank, a 500 kilowatt diesel generator, and a tie to the commercial power grid."
     },
     {
-     "start": 31.814,
-     "end": 36.948,
-     "text": "And on the horizon, wind turbines can add their share when the West Texas wind is blowing."
+     "start": 31.296,
+     "end": 37.903,
+     "text": "On the horizon, wind turbines feed the utility grid, so when the West Texas wind is blowing, grid power gets cheaper."
     }
    ]
   },
   {
    "id": "problem",
-   "start": 72.036,
+   "start": 72.991,
    "dur": 25.953,
    "sentences": [
     {
@@ -104,8 +104,8 @@
   },
   {
    "id": "energy",
-   "start": 97.989,
-   "dur": 45.457,
+   "start": 98.944,
+   "dur": 46.899,
    "sentences": [
     {
      "start": 0.8,
@@ -114,39 +114,39 @@
     },
     {
      "start": 3.663,
-     "end": 9.71,
-     "text": "The 760 kilowatt-hour battery charges when the sun is strong, and discharges when a cloud passes."
+     "end": 9.586,
+     "text": "The 550 kilowatt-hour battery charges when the sun is strong, and discharges when a cloud passes."
     },
     {
-     "start": 10.06,
-     "end": 18.854,
+     "start": 9.936,
+     "end": 18.731,
      "text": "It levels out short swings in available power, so jobs keep running, instead of stopping for a checkpoint and restore cycle every time a cloud drifts by."
     },
     {
-     "start": 19.204,
-     "end": 27.693,
+     "start": 19.081,
+     "end": 27.569,
      "text": "If the utility grid goes down, the UPS carries the cluster through the first seconds, while the 500 kilowatt diesel generator starts and takes over the load."
     },
     {
-     "start": 28.043,
-     "end": 34.001,
+     "start": 27.919,
+     "end": 33.878,
      "text": "The connection to the commercial grid also lets high priority workloads keep running whenever needed, day or night."
     },
     {
-     "start": 34.351,
-     "end": 37.542,
-     "text": "And when the wind is blowing, wind power can join the mix."
+     "start": 34.228,
+     "end": 38.984,
+     "text": "And when the wind is blowing, low cost wind power reaches the cluster through the utility grid."
     },
     {
-     "start": 37.892,
-     "end": 43.957,
+     "start": 39.334,
+     "end": 45.399,
      "text": "Every source can be selected and prioritized by cost and availability, just as a commercial data center would have to."
     }
    ]
   },
   {
    "id": "photon",
-   "start": 143.446,
+   "start": 145.843,
    "dur": 45.266,
    "sentences": [
     {
@@ -193,7 +193,7 @@
   },
   {
    "id": "compute",
-   "start": 188.711,
+   "start": 191.108,
    "dur": 52.377,
    "sentences": [
     {
@@ -230,7 +230,7 @@
   },
   {
    "id": "tokens",
-   "start": 241.088,
+   "start": 243.485,
    "dur": 29.271,
    "sentences": [
     {
@@ -262,7 +262,7 @@
   },
   {
    "id": "measure",
-   "start": 270.359,
+   "start": 272.756,
    "dur": 37.048,
    "sentences": [
     {
@@ -294,7 +294,7 @@
   },
   {
    "id": "remote",
-   "start": 307.407,
+   "start": 309.804,
    "dur": 31.691,
    "sentences": [
     {
@@ -321,7 +321,7 @@
   },
   {
    "id": "schedule",
-   "start": 339.097,
+   "start": 341.494,
    "dur": 27.618,
    "sentences": [
     {
@@ -348,7 +348,7 @@
   },
   {
    "id": "checkpoint",
-   "start": 366.716,
+   "start": 369.112,
    "dur": 28.754,
    "sentences": [
     {
@@ -380,7 +380,7 @@
   },
   {
    "id": "outro",
-   "start": 395.47,
+   "start": 397.867,
    "dur": 24.759,
    "sentences": [
     {

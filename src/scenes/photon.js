@@ -94,7 +94,7 @@ export default function photon(sc) {
   box(.9, 2.6, .9, 0x2a3140, V(9, 1.3, 0), 'PDU');
   box(1.2, 2.2, 1.2, 0x2d3a52, V(5, 1.1, 0), 'UPS');
   // battery + generator appear when the narration brings them onto the bus
-  for (const [w, h, d, col, pos, txt] of [[2.6, 1.8, 1.6, 0xe9e3d2, V(-4, .9, -7), 'Battery · 760 kWh'], [3, 1.8, 1.4, 0xe4e4df, V(-4, .9, -13), 'Generator · 500 kW']]) { box(w, h, d, col, pos, txt); backup.push(...Cg.children.slice(-2)); }
+  for (const [w, h, d, col, pos, txt] of [[2.6, 1.8, 1.6, 0xe9e3d2, V(-4, .9, -7), 'Battery · 550 kWh'], [3, 1.8, 1.4, 0xe4e4df, V(-4, .9, -13), 'Generator · 500 kW']]) { box(w, h, d, col, pos, txt); backup.push(...Cg.children.slice(-2)); }
   const rk = rack(); rk.position.set(15, 0, 0); Cg.add(rk);
   const rkT = textSprite('Server rack', { color: '#fff', h: .5 }); rkT.position.set(15, rk.height + .6, 0); Cg.add(rkT);
   // redundant PSUs on the rear of one node

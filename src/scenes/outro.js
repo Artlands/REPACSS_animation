@@ -19,9 +19,8 @@ export default function outro(sc, shared) {
     card('o-a', `<div class="big" style="font-size:40px">NSF ACCESS</div><div class="cap">allocated production resource · open nationwide</div>`, 90, 760, s(0) + .3, s(2));
     // slogan lock-up (logo mark + three lines), as on the booth artwork
     const sg = win(t, s(1) + .4, s(2) - .3, .6);
-    ui.el('o-sd', '', '', 0, 0, sg * .55, { width: '1920px', height: '1080px', background: 'linear-gradient(90deg,rgba(2,4,10,.85),rgba(2,4,10,.2))', zIndex: -1 });
-    ui.el('o-sm', '', '<img src="assets/mark-red.svg" style="width:300px;display:block">', 110, 330, sg);
-    ui.el('o-sl', 'slogan', 'Accelerating <b>Discovery</b><br><b>Reducing</b> Costs<br>Improving <b>Efficiency</b>', 460, 345, sg, { fontSize: '76px' });
+    ui.el('o-sd', '', '', 0, 0, sg * .55, { width: '1920px', height: '1080px', background: 'radial-gradient(ellipse at center,rgba(2,4,10,.85),rgba(2,4,10,.35))', zIndex: -1 });
+    ui.el('o-sl', '', '<div style="display:flex;align-items:center;gap:50px"><img src="assets/mark-red.svg" style="width:300px;display:block"><div class="slogan" style="font-size:76px;white-space:nowrap">Accelerating <b>Discovery</b><br><b>Reducing</b> Costs<br>Improving <b>Efficiency</b></div></div>', 960, 540, sg, { transform: 'translate(-50%,-50%)' });
     const end = ramp(t, s(2) - .2, 1.2);
     ui.el('o-dim', '', '', 0, 0, end * .6, { width: '1920px', height: '1080px', background: '#02040a', zIndex: -1 });
     ui.el('o-c', 'h1', '<span style="color:var(--sun)">Photons</span> <span style="color:#8090b0">→</span> <span style="color:var(--elec)">Electrons</span> <span style="color:#8090b0">→</span> <span style="color:#8dff6f">FLOPs</span> <span style="color:#8090b0">→</span> <span style="color:var(--tok)">Tokens</span>', 960, 230, end, { fontSize: '54px', transform: 'translateX(-50%)' });
