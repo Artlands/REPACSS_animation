@@ -56,6 +56,7 @@ The models (`mlx-community/Qwen3-TTS-12Hz-1.7B-Base-bf16`, `mlx-community/whispe
 ```bash
 .venv-tts/bin/python narration.py      # 1. narration + timeline (only re-synthesizes changed sentences)
 node render.mjs video                  # 2. full render (~10 min on an M-series Mac)
+SCALE=2 node render.mjs video          #    or render it in 4K (3840×2160, ~17 min)
 .venv-tts/bin/python music.py          # 3. mix music → build/REPACSS_photons_to_tokens.mp4
 ```
 
@@ -68,6 +69,26 @@ node render.mjs zcheck                 # report coplanar overlapping faces (z-fi
 ```
 
 To scrub interactively, open `index.html` through any static server (for example `npx serve`) and add `?t=95` to show a single frame or `?play=95` to play from that time.
+
+### Booth shorts
+
+Five ~1-minute shorts reuse the main scenes with their own narration, an opening title card, burned-in captions (booth screens often play muted) and an end card that fades to black so they loop cleanly. Scripts are `SHORT_*` in `narration.py`; titles are in `src/shorts.js`.
+
+| Story id | Title | Scenes |
+|---|---|---|
+| `short_site` | The site & the microgrid | site, energy |
+| `short_photons` | From photons to tokens | photon, tokens |
+| `short_measure` | Measuring every watt | measure, remote |
+| `short_schedule` | Following the energy | problem, schedule |
+| `short_checkpoint` | Checkpoint & restore | checkpoint |
+
+```bash
+.venv-tts/bin/python narration.py short_site      # → timeline_short_site.json, build/narration_short_site.wav
+STORY=short_site node render.mjs video            # → build/REPACSS_short_site_nomusic.mp4
+.venv-tts/bin/python music.py short_site          # → build/REPACSS_short_site.mp4
+```
+
+A script line can be a `(text, min_span)` pair, so a short line still leaves time for that scene's fixed visual beats.
 
 To tune the music, change the three numbers at the top of `music.py` (`BED_DB`, `DUCK_DB`, `SWELL_DB`), then rerun step 3.
 

@@ -76,9 +76,9 @@ export default function checkpoint(sc) {
     ui.label('ck-nv', 'local NVMe<small>1.92 TB per node</small>', dst.clone().add(V(.3, .25, 0)), camera, win(t, s(2) + .5, sc.dur, .5), '#7fe6ff');
     // power gauge + event timeline
     const gw = 520;
-    ui.el('ck-g', 'card', `<div class="cap" style="margin:0 0 10px">Solar supply · ${Math.round(P * 100)}%</div><div style="width:${gw}px;height:14px;border-radius:7px;background:rgba(255,255,255,.08);overflow:hidden"><div style="width:${P * gw}px;height:14px;background:linear-gradient(90deg,#ff6b3d,#ffb53c)"></div></div><div class="cap" style="margin:14px 0 10px">Battery charge · ${Math.round(B * 100)}%</div><div style="width:${gw}px;height:14px;border-radius:7px;background:rgba(255,255,255,.08);overflow:hidden"><div style="width:${B * gw}px;height:14px;background:${B < .25 ? '#ffb020' : 'linear-gradient(90deg,#2fbf71,#7dffa5)'}"></div></div>`, 90, 740, win(t, .6, sc.dur, .5));
+    ui.el('ck-g', 'card', `<div class="cap" style="margin:0 0 10px">Solar supply · ${Math.round(P * 100)}%</div><div style="width:${gw}px;height:14px;border-radius:7px;background:rgba(255,255,255,.08);overflow:hidden"><div style="width:${P * gw}px;height:14px;background:linear-gradient(90deg,#ff6b3d,#ffb53c)"></div></div><div class="cap" style="margin:14px 0 10px">Battery charge · ${Math.round(B * 100)}%</div><div style="width:${gw}px;height:14px;border-radius:7px;background:rgba(255,255,255,.08);overflow:hidden"><div style="width:${B * gw}px;height:14px;background:${B < .25 ? '#ffb020' : 'linear-gradient(90deg,#2fbf71,#7dffa5)'}"></div></div>`, 90, 700, win(t, .6, sc.dur, .5));
     const ev = [['periodic checkpoint', ck1], ['cloud cover', cloudAt], ['battery bridges', cloudAt + .8], ['battery low → checkpoint', ck2], ['power down', offA], ['sun returns', s(4) + .4], ['restore', rs]];
-    ui.el('ck-tl', 'card', ev.map(([n, a]) => `<span style="opacity:${t > a ? 1 : .25};margin-right:22px">● ${n}</span>`).join(''), 90, 960, win(t, .6, sc.dur, .5), { fontSize: '20px' });
+    ui.el('ck-tl', 'card', ev.map(([n, a]) => `<span style="opacity:${t > a ? 1 : .25};margin-right:22px">● ${n}</span>`).join(''), 90, 910, win(t, .6, sc.dur, .5), { fontSize: '20px' });
   }
   return { scene, camera, update, bloom: { strength: .85, radius: .5, threshold: .72 } };
 }

@@ -5,9 +5,13 @@ Voice: Qwen3-TTS 1.7B Base (Apache-2.0) via mlx-audio, cloned from one fixed ref
 Each sentence is synthesized separately so the animation can key visual beats to exact sentence start times.
 Every take is transcribed with Whisper and pitch-checked against the reference; takes that garble words,
 misread a number, or drift from the reference voice are re-rolled with a new seed.
-Usage: .venv-tts/bin/python narration.py            (reuses cached takes in build/tts unless the text changed)
+Usage: .venv-tts/bin/python narration.py [short_site]   (reuses cached takes in build/tts unless the text changed)
+The optional story id picks a script from STORIES and suffixes every output (timeline_short_site.json, ...).
+A sentence may be a (text, min_span) pair: the next sentence then starts no earlier than min_span seconds after this one
+(or, for a scene's last sentence, the scene lasts at least that long after it), so fixed visual beats keyed to
+"sentence i + N s" still fit when the narration is short.
 """
-import difflib, hashlib, json, os, re, wave
+import difflib, hashlib, json, os, re, sys, wave
 import numpy as np
 
 MODEL = "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-bf16"
@@ -110,6 +114,94 @@ SCRIPT = [
         "From photons, to electrons, to tokens. This is REPACSS.",
     ]),
 ]
+
+# ---- ~1 minute booth shorts: reuse the main scenes (same sentence count and order, so each scene's beats still land),
+# shorter lines, plus a one-line end card. Min spans come from the largest "s(i) + N" offset in each scene's code.
+SHORT_SITE = [
+    ("site", 0.8, 0.8, [
+        "This is GLEAMM, a microgrid laboratory ten miles west of Texas Tech in Lubbock.",
+        ("Since 2015, it has given REPACSS its building, its power, and dense instrumentation and control.", 5.1),
+        ("Its main renewable source is a 350 kilowatt solar array, right beside the machine room.", 3.6),
+        ("Next to it sit a 550 kilowatt-hour battery, a 500 kilowatt diesel generator, and the commercial grid.", 4.6),
+        ("Nearby wind turbines feed the utility grid, so grid power gets cheaper when the wind blows.", 1.2),
+    ]),
+    ("energy", 0.6, 0.8, [
+        "Sunlight is only the start.",
+        ("The battery charges in strong sun, and discharges when a cloud passes.", 3.6),
+        ("That smooths out short swings, so jobs keep running instead of stopping for a checkpoint.", 7.6),
+        ("If the grid fails, the UPS bridges the first seconds until the generator takes over.", 6.6),
+        ("The commercial grid keeps priority work running, day or night.", 1.6),
+        ("When the wind blows, low cost wind power arrives through the grid.", 1.1),
+        ("Every source is chosen by cost and availability.", 2.1),
+    ]),
+    ("endcard", 0.4, 3.2, ["REPACSS. Making the computer follow the energy."]),
+]
+SHORT_PHOTONS = [
+    ("photon", 0.8, 0.8, [
+        "Follow a single photon from the sun.",
+        ("Eight minutes after leaving the sun, it strikes a silicon solar cell.", 2.6),
+        ("Its energy knocks an electron loose, and leaves behind a hole.", 3.2),
+        ("The electric field at the p-n junction sweeps them apart. That is direct current.", 6.1),
+        ("Cells are strung into modules, and modules into arrays.", 3.8),
+        ("An inverter shapes the DC into clean, 60 hertz AC.", 1.6),
+        ("The battery, the generator, and the utility grid join the same bus.", 3.1),
+        ("Power then flows through the UPS and the PDUs, to redundant supplies in every server.", 4.1),
+    ]),
+    ("tokens", 0.6, 0.8, [
+        "On a GPU, electrons become arithmetic.",
+        ("Tensor cores switch billions of times a second, multiplying model weights against your prompt.", 2.1),
+        ("Layer after layer, a probability distribution emerges, and the next token is chosen.", 4.6),
+        ("Then the next. And the next.", 1.6),
+        ("Sunlight, electrons, floating point operations, tokens. REPACSS makes that chain visible, and measurable.", 1.6),
+    ]),
+    ("endcard", 0.4, 3.2, ["REPACSS. From photons to tokens."]),
+]
+SHORT_MEASURE = [
+    ("measure", 0.8, 0.8, [
+        "REPACSS measures every watt, and the shape of every waveform.",
+        ("GLEAMM's phasor measurement units and protective relays sample voltage and current across the facility.", 4.6),
+        ("That reveals power quality, including harmonic distortion: the extra frequencies that power supplies add to the clean 60 hertz wave.", 2.2),
+        ("The team studies how different workloads, and even individual codes, change those signatures.", 1.2),
+        ("It also measures the total energy each code uses, so researchers can see what a result really costs.", 4.6),
+    ]),
+    ("remote", 0.6, 0.8, [
+        ("Measurement drives a research challenge: remote data center management.", 2.1),
+        "A facility on variable energy cannot wait for someone to walk the machine room floor.",
+        ("Telemetry streams from every node, power, temperature, and utilization, so operators can watch and act remotely.", 8.1),
+        ("A private control network reaches the UPS, the power distribution units, and the in-row coolers.", 0.9),
+    ]),
+    ("endcard", 0.4, 3.2, ["REPACSS. Every watt, measured."]),
+]
+SHORT_SCHEDULE = [
+    ("problem", 0.8, 0.8, [
+        "Supercomputers are hungry machines, built to draw steady power around the clock.",
+        "Renewable energy does not work that way.",
+        ("Solar output rises and falls with the day, and drops every time a cloud passes.", 4.1),
+        ("REPACSS, funded by the National Science Foundation, flips the usual design.", 0.9),
+        ("Instead of forcing the energy to follow the computer, it teaches the computer to follow the energy.", 3.1),
+    ]),
+    ("schedule", 0.6, 0.8, [
+        "The key is energy-aware scheduling.",
+        ("The team is building algorithms for the Slurm scheduler that read solar production forecasts, and place scientific workloads where the power is.", 2.6),
+        ("Large parallel runs at solar noon, flexible and preemptible jobs filling the gaps, lighter work after sunset.", 2.6),
+        ("The goal: match as much computing as possible to low cost energy, while studying the tradeoff between cost and quality of service.", 0.9),
+    ]),
+    ("endcard", 0.4, 3.2, ["REPACSS. Computing that follows the sun."]),
+]
+SHORT_CHECKPOINT = [
+    ("checkpoint", 0.8, 0.8, [
+        "What happens to a running job when a cloud covers the sun? REPACSS answers with checkpoint and restore.",
+        ("At first, the battery rides through the dip. But when clouds linger and stored energy runs low, running jobs cannot simply die.", 1.8),
+        ("So applications periodically save their state, using nearly two terabytes of fast local NVMe on every node.", 1.1),
+        ("With their state safe, nodes can idle, or power down completely.", 1.6),
+        ("When the energy returns, jobs restore and continue exactly where they left off, with their data intact. Computing pauses with the weather, and picks up again with the sun.", 3.0),
+    ]),
+    ("endcard", 0.4, 3.2, ["REPACSS. Computing that follows the energy."]),
+]
+STORIES = {"photons": SCRIPT, "short_site": SHORT_SITE, "short_photons": SHORT_PHOTONS, "short_measure": SHORT_MEASURE,
+           "short_schedule": SHORT_SCHEDULE, "short_checkpoint": SHORT_CHECKPOINT}
+STORY = sys.argv[1] if len(sys.argv) > 1 else "photons"
+SFX = "" if STORY == "photons" else "_" + STORY
 
 # Spoken-form fixes so the TTS pronounces acronyms well. Display text keeps the original.
 SPOKEN = [
@@ -224,25 +316,27 @@ def main():
         pcm.extend(b"\0\0" * n)
         t += n / SR
 
-    for sid, lead, tail, sentences in SCRIPT:
+    for sid, lead, tail, sentences in STORIES[STORY]:
         start = t
         silence(lead)
-        sents = []
+        sents, s0, span = [], t, 0.0
         for i, s in enumerate(sentences):
-            if i: silence(GAP)
+            s, nspan = (s, 0.0) if isinstance(s, str) else s
+            if i: silence(max(GAP, s0 + span - t))
+            s0, span = t, nspan
             print(f"{sid}[{i}] {s[:70]}")
-            dur, frames = tts(s, f"build/tts/{sid}_{i}.wav")
+            dur, frames = tts(s, f"build/tts/{STORY + '_' if SFX else ''}{sid}_{i}.wav")
             sents.append({"start": round(t - start, 3), "end": round(t - start + dur, 3), "text": s})
             srt.append((t, t + dur, s))
             pcm.extend(frames)
             t += dur
-        silence(tail)
+        silence(max(tail, s0 + span + 1.0 - t))
         scenes.append({"id": sid, "start": round(start, 3), "dur": round(t - start, 3), "sentences": sents})
 
-    with wave.open("build/narration.wav", "wb") as w:
+    with wave.open(f"build/narration{SFX}.wav", "wb") as w:
         w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR); w.writeframes(bytes(pcm))
-    json.dump({"total": round(t, 3), "scenes": scenes}, open("timeline.json", "w"), indent=1)
-    with open("build/captions.srt", "w") as f:
+    json.dump({"total": round(t, 3), "scenes": scenes}, open(f"timeline{SFX}.json", "w"), indent=1)
+    with open(f"build/captions{SFX}.srt", "w") as f:
         for i, (a0, a1, s) in enumerate(srt, 1):
             f.write(f"{i}\n{srt_time(a0)} --> {srt_time(a1)}\n{s}\n\n")
     for s in scenes:

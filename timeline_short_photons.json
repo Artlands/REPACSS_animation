@@ -1,0 +1,96 @@
+{
+ "total": 66.695,
+ "scenes": [
+  {
+   "id": "photon",
+   "start": 0.0,
+   "dur": 35.989,
+   "sentences": [
+    {
+     "start": 0.8,
+     "end": 2.847,
+     "text": "Follow a single photon from the sun."
+    },
+    {
+     "start": 3.197,
+     "end": 7.246,
+     "text": "Eight minutes after leaving the sun, it strikes a silicon solar cell."
+    },
+    {
+     "start": 7.596,
+     "end": 11.08,
+     "text": "Its energy knocks an electron loose, and leaves behind a hole."
+    },
+    {
+     "start": 11.43,
+     "end": 16.193,
+     "text": "The electric field at the p-n junction sweeps them apart. That is direct current."
+    },
+    {
+     "start": 17.53,
+     "end": 20.971,
+     "text": "Cells are strung into modules, and modules into arrays."
+    },
+    {
+     "start": 21.33,
+     "end": 24.734,
+     "text": "An inverter shapes the DC into clean, 60 hertz AC."
+    },
+    {
+     "start": 25.084,
+     "end": 29.721,
+     "text": "The battery, the generator, and the utility grid join the same bus."
+    },
+    {
+     "start": 30.071,
+     "end": 35.189,
+     "text": "Power then flows through the UPS and the PDUs, to redundant supplies in every server."
+    }
+   ]
+  },
+  {
+   "id": "tokens",
+   "start": 35.989,
+   "dur": 24.461,
+   "sentences": [
+    {
+     "start": 0.6,
+     "end": 3.714,
+     "text": "On a GPU, electrons become arithmetic."
+    },
+    {
+     "start": 4.064,
+     "end": 9.016,
+     "text": "Tensor cores switch billions of times a second, multiplying model weights against your prompt."
+    },
+    {
+     "start": 9.366,
+     "end": 14.443,
+     "text": "Layer after layer, a probability distribution emerges, and the next token is chosen."
+    },
+    {
+     "start": 14.793,
+     "end": 16.621,
+     "text": "Then the next. And the next."
+    },
+    {
+     "start": 16.971,
+     "end": 23.661,
+     "text": "Sunlight, electrons, floating point operations, tokens. REPACSS makes that chain visible, and measurable."
+    }
+   ]
+  },
+  {
+   "id": "endcard",
+   "start": 60.45,
+   "dur": 6.245,
+   "sentences": [
+    {
+     "start": 0.4,
+     "end": 3.045,
+     "text": "REPACSS. From photons to tokens."
+    }
+   ]
+  }
+ ]
+}

@@ -86,8 +86,8 @@ export default function schedule(sc) {
 
     ui.header('sch-h', 'Research challenge 2', 'Workflow scheduling integration', win(t, .4, sc.dur, .6));
     ui.el('sch-f', 'card', `<div class="cap" style="margin:0">Energy-aware placement</div><div style="font-size:23px;margin-top:8px;line-height:1.55">solar production forecast<br>→ Slurm scheduling policies<br>→ jobs placed where the power is</div>`, 1350, 170, win(t, s(1) + .3, sc.dur, .5));
-    Object.entries(KINDS).forEach(([k, v], i) => ui.el('sch-l' + k, 'chip', `<span style="display:inline-block;width:16px;height:16px;border-radius:3px;background:#${v.color.toString(16).padStart(6, '0')};margin-right:10px"></span>${v.name}`, 90 + i * 300, 960, ramp(t, s(2) + i * .7, .5), { fontSize: '21px' }));
-    ui.el('sch-g', 'card', `<div class="cap" style="margin:0">Trade-off under study</div><div style="font-size:23px;margin-top:8px">energy cost &nbsp;⟷&nbsp; quality of service (wait time, deadlines)</div>`, 90, 820, win(t, s(3) + .3, sc.dur, .5));
+    Object.entries(KINDS).forEach(([k, v], i) => ui.el('sch-l' + k, 'chip', `<span style="display:inline-block;width:16px;height:16px;border-radius:3px;background:#${v.color.toString(16).padStart(6, '0')};margin-right:10px"></span>${v.name}`, 90 + i * 300, 910, ramp(t, s(2) + i * .7, .5), { fontSize: '21px' }));
+    ui.el('sch-g', 'card', `<div class="cap" style="margin:0">Trade-off under study</div><div style="font-size:23px;margin-top:8px">energy cost &nbsp;⟷&nbsp; quality of service (wait time, deadlines)</div>`, 90, 790, win(t, s(3) + .3, sc.dur, .5));
   }
   return { scene, camera, update, env: .15, bloom: { strength: .6, radius: .4, threshold: .8 } };
 }

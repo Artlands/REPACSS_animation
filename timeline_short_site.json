@@ -1,0 +1,91 @@
+{
+ "total": 72.209,
+ "scenes": [
+  {
+   "id": "site",
+   "start": 0.0,
+   "dur": 32.739,
+   "sentences": [
+    {
+     "start": 0.8,
+     "end": 5.58,
+     "text": "This is GLEAMM, a microgrid laboratory ten miles west of Texas Tech in Lubbock."
+    },
+    {
+     "start": 5.93,
+     "end": 12.645,
+     "text": "Since 2015, it has given REPACSS its building, its power, and dense instrumentation and control."
+    },
+    {
+     "start": 12.995,
+     "end": 18.58,
+     "text": "Its main renewable source is a 350 kilowatt solar array, right beside the machine room."
+    },
+    {
+     "start": 18.93,
+     "end": 26.064,
+     "text": "Next to it sit a 550 kilowatt-hour battery, a 500 kilowatt diesel generator, and the commercial grid."
+    },
+    {
+     "start": 26.414,
+     "end": 31.939,
+     "text": "Nearby wind turbines feed the utility grid, so grid power gets cheaper when the wind blows."
+    }
+   ]
+  },
+  {
+   "id": "energy",
+   "start": 32.739,
+   "dur": 32.8,
+   "sentences": [
+    {
+     "start": 0.6,
+     "end": 2.244,
+     "text": "Sunlight is only the start."
+    },
+    {
+     "start": 2.594,
+     "end": 6.839,
+     "text": "The battery charges in strong sun, and discharges when a cloud passes."
+    },
+    {
+     "start": 7.189,
+     "end": 12.163,
+     "text": "That smooths out short swings, so jobs keep running instead of stopping for a checkpoint."
+    },
+    {
+     "start": 14.789,
+     "end": 19.776,
+     "text": "If the grid fails, the UPS bridges the first seconds until the generator takes over."
+    },
+    {
+     "start": 21.389,
+     "end": 24.837,
+     "text": "The commercial grid keeps priority work running, day or night."
+    },
+    {
+     "start": 25.187,
+     "end": 28.791,
+     "text": "When the wind blows, low cost wind power arrives through the grid."
+    },
+    {
+     "start": 29.141,
+     "end": 32.0,
+     "text": "Every source is chosen by cost and availability."
+    }
+   ]
+  },
+  {
+   "id": "endcard",
+   "start": 65.539,
+   "dur": 6.67,
+   "sentences": [
+    {
+     "start": 0.4,
+     "end": 3.47,
+     "text": "REPACSS. Making the computer follow the energy."
+    }
+   ]
+  }
+ ]
+}

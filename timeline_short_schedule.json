@@ -1,0 +1,76 @@
+{
+ "total": 57.198,
+ "scenes": [
+  {
+   "id": "problem",
+   "start": 0.0,
+   "dur": 25.149,
+   "sentences": [
+    {
+     "start": 0.8,
+     "end": 5.67,
+     "text": "Supercomputers are hungry machines, built to draw steady power around the clock."
+    },
+    {
+     "start": 6.02,
+     "end": 8.407,
+     "text": "Renewable energy does not work that way."
+    },
+    {
+     "start": 8.757,
+     "end": 13.627,
+     "text": "Solar output rises and falls with the day, and drops every time a cloud passes."
+    },
+    {
+     "start": 13.977,
+     "end": 18.887,
+     "text": "REPACSS, funded by the National Science Foundation, flips the usual design."
+    },
+    {
+     "start": 19.237,
+     "end": 24.349,
+     "text": "Instead of forcing the energy to follow the computer, it teaches the computer to follow the energy."
+    }
+   ]
+  },
+  {
+   "id": "schedule",
+   "start": 25.149,
+   "dur": 26.067,
+   "sentences": [
+    {
+     "start": 0.6,
+     "end": 2.807,
+     "text": "The key is energy-aware scheduling."
+    },
+    {
+     "start": 3.157,
+     "end": 10.999,
+     "text": "The team is building algorithms for the Slurm scheduler that read solar production forecasts, and place scientific workloads where the power is."
+    },
+    {
+     "start": 11.349,
+     "end": 18.074,
+     "text": "Large parallel runs at solar noon, flexible and preemptible jobs filling the gaps, lighter work after sunset."
+    },
+    {
+     "start": 18.424,
+     "end": 25.267,
+     "text": "The goal: match as much computing as possible to low cost energy, while studying the tradeoff between cost and quality of service."
+    }
+   ]
+  },
+  {
+   "id": "endcard",
+   "start": 51.216,
+   "dur": 5.983,
+   "sentences": [
+    {
+     "start": 0.4,
+     "end": 2.783,
+     "text": "REPACSS. Computing that follows the sun."
+    }
+   ]
+  }
+ ]
+}

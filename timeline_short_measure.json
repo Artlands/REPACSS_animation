@@ -1,0 +1,76 @@
+{
+ "total": 61.248,
+ "scenes": [
+  {
+   "id": "measure",
+   "start": 0.0,
+   "dur": 30.703,
+   "sentences": [
+    {
+     "start": 0.8,
+     "end": 4.368,
+     "text": "REPACSS measures every watt, and the shape of every waveform."
+    },
+    {
+     "start": 4.718,
+     "end": 10.207,
+     "text": "GLEAMM's phasor measurement units and protective relays sample voltage and current across the facility."
+    },
+    {
+     "start": 10.557,
+     "end": 18.262,
+     "text": "That reveals power quality, including harmonic distortion: the extra frequencies that power supplies add to the clean 60 hertz wave."
+    },
+    {
+     "start": 18.612,
+     "end": 23.53,
+     "text": "The team studies how different workloads, and even individual codes, change those signatures."
+    },
+    {
+     "start": 23.88,
+     "end": 29.903,
+     "text": "It also measures the total energy each code uses, so researchers can see what a result really costs."
+    }
+   ]
+  },
+  {
+   "id": "remote",
+   "start": 30.703,
+   "dur": 24.687,
+   "sentences": [
+    {
+     "start": 0.6,
+     "end": 4.22,
+     "text": "Measurement drives a research challenge: remote data center management."
+    },
+    {
+     "start": 4.57,
+     "end": 9.096,
+     "text": "A facility on variable energy cannot wait for someone to walk the machine room floor."
+    },
+    {
+     "start": 9.446,
+     "end": 16.325,
+     "text": "Telemetry streams from every node, power, temperature, and utilization, so operators can watch and act remotely."
+    },
+    {
+     "start": 17.546,
+     "end": 23.887,
+     "text": "A private control network reaches the UPS, the power distribution units, and the in-row coolers."
+    }
+   ]
+  },
+  {
+   "id": "endcard",
+   "start": 55.39,
+   "dur": 5.859,
+   "sentences": [
+    {
+     "start": 0.4,
+     "end": 2.659,
+     "text": "REPACSS. Every watt, measured."
+    }
+   ]
+  }
+ ]
+}

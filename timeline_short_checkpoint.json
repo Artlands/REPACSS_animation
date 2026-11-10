@@ -1,0 +1,49 @@
+{
+ "total": 43.851,
+ "scenes": [
+  {
+   "id": "checkpoint",
+   "start": 0.0,
+   "dur": 37.52,
+   "sentences": [
+    {
+     "start": 0.8,
+     "end": 6.632,
+     "text": "What happens to a running job when a cloud covers the sun? REPACSS answers with checkpoint and restore."
+    },
+    {
+     "start": 6.982,
+     "end": 14.692,
+     "text": "At first, the battery rides through the dip. But when clouds linger and stored energy runs low, running jobs cannot simply die."
+    },
+    {
+     "start": 15.042,
+     "end": 22.155,
+     "text": "So applications periodically save their state, using nearly two terabytes of fast local NVMe on every node."
+    },
+    {
+     "start": 22.505,
+     "end": 26.546,
+     "text": "With their state safe, nodes can idle, or power down completely."
+    },
+    {
+     "start": 26.896,
+     "end": 36.72,
+     "text": "When the energy returns, jobs restore and continue exactly where they left off, with their data intact. Computing pauses with the weather, and picks up again with the sun."
+    }
+   ]
+  },
+  {
+   "id": "endcard",
+   "start": 37.52,
+   "dur": 6.331,
+   "sentences": [
+    {
+     "start": 0.4,
+     "end": 3.131,
+     "text": "REPACSS. Computing that follows the energy."
+    }
+   ]
+  }
+ ]
+}

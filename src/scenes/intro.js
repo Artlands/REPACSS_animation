@@ -164,8 +164,8 @@ export default function intro(sc) {
 
     // overlay
     const o1 = win(t, .4, s(3) - .4, .8);
-    ui.el('i-q', 'sub', 'Every answer an AI model gives you is built one token at a time.', 90, 940, o1 * ramp(t, s(0) + .2, .6), { fontSize: '30px', color: '#cfd8ee' });
-    ui.el('i-q2', 'sub', '…and every token begins as energy.', 90, 990, o1 * ramp(t, s(1), .6), { fontSize: '30px', color: 'var(--sun)' });
+    ui.el('i-q', 'sub', 'Every answer an AI model gives you is built one token at a time.', 90, 850, o1 * ramp(t, s(0) + .2, .6), { fontSize: '30px', color: '#cfd8ee' });
+    ui.el('i-q2', 'sub', '…and every token begins as energy.', 90, 900, o1 * ramp(t, s(1), .6), { fontSize: '30px', color: 'var(--sun)' });
     ui.label('i-sun', 'The Sun<small>150 million km away · light takes 8 min 20 s</small>', SUN.clone().add(V(0, 26, 0)), camera, win(t, s(2) + .3, s(3) + .5, .6), '#ffd27a');
     ui.label('i-earth', 'Earth', target.clone().multiplyScalar(R * 1.35).add(V(0, 4, 0)), camera, win(t, s(2) + 3.6, s(3) + .5, .6), '#9fd0ff');
     const ot = win(t, s(3) + .3, s(5) + 1.2, 1);
